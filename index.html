@@ -606,10 +606,12 @@
 
   var TIPOS = [
     { id: "leve",     label: "Viatura leve",   icon: iconCar },
-    { id: "blindada", label: "Blindada",        icon: iconArmored },
-    { id: "caminhao", label: "Caminhão",        icon: iconTruck },
-    { id: "moto",     label: "Motocicleta",     icon: iconMoto },
+    { id: "5ton",     label: "5 Ton",          icon: iconTruck },
+    { id: "marrua",   label: "Marruá",         icon: iconOffroad },
     { id: "onibus",   label: "Ônibus",          icon: iconBus },
+    { id: "reboque",  label: "Reboque",        icon: iconTrailer },
+    { id: "blindada", label: "Blindada",        icon: iconArmored },
+    { id: "moto",     label: "Motocicleta",     icon: iconMoto },
     { id: "outro",    label: "Outro",           icon: iconWrenchVeh }
   ];
   var TIPO_MAP = {};
@@ -627,6 +629,8 @@
   function iconMoto() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="5.5" cy="17" r="2.6"/><circle cx="18" cy="17" r="2.6"/><path d="M8 17h5.5L16 11h3M9 11h4l1.5 3M6 14l3.5-6h3"/></svg>'; }
   function iconBus() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="12.5" rx="2"/><path d="M3 10h18M8 4v6M16 4v6"/><circle cx="7.5" cy="19" r="1.5"/><circle cx="16.5" cy="19" r="1.5"/></svg>'; }
   function iconWrenchVeh() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a3.5 3.5 0 0 0-4.6 4.2L4 16.6V20h3.4l6.1-6.1a3.5 3.5 0 0 0 4.2-4.6l-2.6 2.6-2-2 2.6-2.6Z"/></svg>'; }
+  function iconOffroad() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 15v-3.3a1 1 0 0 1 .3-.7L5.2 9h9.6l2.6 1.9a1 1 0 0 1 .4.8V15"/><path d="M2 15h20"/><rect x="3" y="15" width="18" height="3.2" rx="1"/><path d="M7 9V6.3h4.5M13.5 9l-1-2.7h2.3"/><circle cx="7.5" cy="19.2" r="1.6"/><circle cx="16.5" cy="19.2" r="1.6"/></svg>'; }
+  function iconTrailer() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.5" y="8.5" width="16" height="7.5" rx="1.2"/><path d="M4.5 13H1.8a1 1 0 0 1-1-1v-.6"/><circle cx="8.5" cy="18.6" r="1.6"/><circle cx="16.5" cy="18.6" r="1.6"/></svg>'; }
   function iconGood() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>'; }
   function iconWarn() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>'; }
   function iconCrit() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="m9.5 9.5 5 5m0-5-5 5"/></svg>'; }
@@ -652,41 +656,41 @@
     }
     return [
       v({ prefixo: "EB3411237965", chassi: "9532882W9DR331738", tipo: "onibus", modelo: "Volkswagen 15190 (Ônibus Rural)", ano: 2013, situacao: "operacional", km: 0, observacoes: "Ar-condicionado não funciona." }),
-      v({ prefixo: "EB3412147644", chassi: "9533172S0AR039214", tipo: "caminhao", modelo: "Volkswagen 26.220 Worker (5 Ton)", ano: 2010, situacao: "manutencao", km: 40576, observacoes: "Motivo: catraca de regulagem da cuíca. Peça necessária: diafragma da cuíca de freio (qtd 1)." }),
-      v({ prefixo: "EB3412137820", chassi: "9533172S1BR117162", tipo: "caminhao", modelo: "Volkswagen 26.220 Worker (5 Ton)", ano: 2010, situacao: "manutencao", km: 42726, observacoes: "Motivo: embreagem." }),
-      v({ prefixo: "EB3412163736", chassi: "9BM958034CB883958", tipo: "caminhao", modelo: "Mercedes Atego 1418 (5 Ton Comercial)", ano: 2012, situacao: "operacional", km: 63003 }),
-      v({ prefixo: "EB3412277388", chassi: "9BM958078DB920335", tipo: "caminhao", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2013, situacao: "operacional", km: 63010 }),
-      v({ prefixo: "EB3412071243", chassi: "9BM958078DB920090", tipo: "caminhao", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2013, situacao: "operacional", km: 56928 }),
-      v({ prefixo: "EB3412277376", chassi: "9BM958078DB920956", tipo: "caminhao", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2013, situacao: "operacional", km: 47097, observacoes: "Motivo: retentor do cilindro do basculante. Peça necessária: retentor (qtd 1)." }),
-      v({ prefixo: "EB3412071229", chassi: "9BM958078DB920986", tipo: "caminhao", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "operacional", km: 35134, observacoes: "Motivo: retentor do cilindro do basculante. Peça necessária: retentor (qtd 1)." }),
-      v({ prefixo: "EB3412071421", chassi: "9BM958078DB921707", tipo: "caminhao", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "manutencao", km: 56928, observacoes: "Motivo: viatura sem força." }),
-      v({ prefixo: "EB3412277402", chassi: "9BM958078DB918956", tipo: "caminhao", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "operacional", km: 61424, observacoes: "Peça necessária: cardan dianteiro (qtd 1)." }),
-      v({ prefixo: "EB3412071371", chassi: "9BM958078DB906559", tipo: "caminhao", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "operacional", km: 54094 }),
-      v({ prefixo: "EB3412277352", chassi: "9BM958078DB920616", tipo: "caminhao", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "operacional", km: 83506 }),
-      v({ prefixo: "EB3412277390", chassi: "9BM958078DB921688", tipo: "caminhao", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "operacional", km: 0 }),
-      v({ prefixo: "EB3412071270", chassi: "9BM958078DB915746", tipo: "caminhao", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "operacional", km: 76862 }),
-      v({ prefixo: "EB3412277349", chassi: "9BM958078DB918916", tipo: "caminhao", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "manutencao", km: 0, observacoes: "Motivo: caixa de marcha quebrada; barra de ligação; cardan dianteiro; base da CTM quebrada. Peças necessárias: caixa de marcha (qtd 1); barra de ligação (qtd 2); cardan dianteiro (qtd 1); base da CTM (qtd 2)." }),
-      v({ prefixo: "EB3412277337", chassi: "9BM958078DB920012", tipo: "caminhao", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "operacional", km: 22478, observacoes: "Motivo: vazamento na junta da caixa de marcha; cilindro da cabine. Peças necessárias: junta da caixa de marcha (qtd 1); cilindro da cabine (qtd 1)." }),
-      v({ prefixo: "EB3412277414", chassi: "9BM958078DB921070", tipo: "caminhao", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "operacional", km: 67842, observacoes: "Motivo: alinhamento e balanceamento." }),
-      v({ prefixo: "EB3417086935", chassi: "VS9ARPACFD1233071", tipo: "outro", modelo: "Reboque Cozinha de Campanha Arpa", ano: 2014, situacao: "manutencao", km: 0, observacoes: "Viatura recolhida pelo Parque de Manaus para revitalização do sistema de freios e iluminação." }),
+      v({ prefixo: "EB3412147644", chassi: "9533172S0AR039214", tipo: "5ton", modelo: "Volkswagen 26.220 Worker (5 Ton)", ano: 2010, situacao: "manutencao", km: 40576, observacoes: "Motivo: catraca de regulagem da cuíca. Peça necessária: diafragma da cuíca de freio (qtd 1)." }),
+      v({ prefixo: "EB3412137820", chassi: "9533172S1BR117162", tipo: "5ton", modelo: "Volkswagen 26.220 Worker (5 Ton)", ano: 2010, situacao: "manutencao", km: 42726, observacoes: "Motivo: embreagem." }),
+      v({ prefixo: "EB3412163736", chassi: "9BM958034CB883958", tipo: "5ton", modelo: "Mercedes Atego 1418 (5 Ton Comercial)", ano: 2012, situacao: "operacional", km: 63003 }),
+      v({ prefixo: "EB3412277388", chassi: "9BM958078DB920335", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2013, situacao: "operacional", km: 63010 }),
+      v({ prefixo: "EB3412071243", chassi: "9BM958078DB920090", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2013, situacao: "operacional", km: 56928 }),
+      v({ prefixo: "EB3412277376", chassi: "9BM958078DB920956", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2013, situacao: "operacional", km: 47097, observacoes: "Motivo: retentor do cilindro do basculante. Peça necessária: retentor (qtd 1)." }),
+      v({ prefixo: "EB3412071229", chassi: "9BM958078DB920986", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "operacional", km: 35134, observacoes: "Motivo: retentor do cilindro do basculante. Peça necessária: retentor (qtd 1)." }),
+      v({ prefixo: "EB3412071421", chassi: "9BM958078DB921707", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "manutencao", km: 56928, observacoes: "Motivo: viatura sem força." }),
+      v({ prefixo: "EB3412277402", chassi: "9BM958078DB918956", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "operacional", km: 61424, observacoes: "Peça necessária: cardan dianteiro (qtd 1)." }),
+      v({ prefixo: "EB3412071371", chassi: "9BM958078DB906559", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "operacional", km: 54094 }),
+      v({ prefixo: "EB3412277352", chassi: "9BM958078DB920616", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "operacional", km: 83506 }),
+      v({ prefixo: "EB3412277390", chassi: "9BM958078DB921688", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "operacional", km: 0 }),
+      v({ prefixo: "EB3412071270", chassi: "9BM958078DB915746", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "operacional", km: 76862 }),
+      v({ prefixo: "EB3412277349", chassi: "9BM958078DB918916", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "manutencao", km: 0, observacoes: "Motivo: caixa de marcha quebrada; barra de ligação; cardan dianteiro; base da CTM quebrada. Peças necessárias: caixa de marcha (qtd 1); barra de ligação (qtd 2); cardan dianteiro (qtd 1); base da CTM (qtd 2)." }),
+      v({ prefixo: "EB3412277337", chassi: "9BM958078DB920012", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "operacional", km: 22478, observacoes: "Motivo: vazamento na junta da caixa de marcha; cilindro da cabine. Peças necessárias: junta da caixa de marcha (qtd 1); cilindro da cabine (qtd 1)." }),
+      v({ prefixo: "EB3412277414", chassi: "9BM958078DB921070", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)", ano: 2014, situacao: "operacional", km: 67842, observacoes: "Motivo: alinhamento e balanceamento." }),
+      v({ prefixo: "EB3417086935", chassi: "VS9ARPACFD1233071", tipo: "reboque", modelo: "Reboque Cozinha de Campanha Arpa", ano: 2014, situacao: "manutencao", km: 0, observacoes: "Viatura recolhida pelo Parque de Manaus para revitalização do sistema de freios e iluminação." }),
       v({ prefixo: "EB3413528342", chassi: "8AJFA8CB4L2009665", tipo: "leve", modelo: "Toyota Hilux CS/Ambulância", ano: 2020, situacao: "operacional", km: 31765 }),
-      v({ prefixo: "EB3412201012", chassi: "9BYU43159EC002525", tipo: "leve", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2014, situacao: "operacional", km: 51717 }),
-      v({ prefixo: "EB3412201289", chassi: "9BYU43159EC002526", tipo: "leve", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2014, situacao: "operacional", km: 58498 }),
-      v({ prefixo: "EB3412229960", chassi: "9BYU43159EC001939", tipo: "leve", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2013, situacao: "operacional", km: 75333 }),
-      v({ prefixo: "EB3412229958", chassi: "9BYU43159EC001940", tipo: "leve", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2013, situacao: "manutencao", km: 96941, observacoes: "Motivo: diferencial dianteiro — parafuso de fixação da tampa quebrou dentro." }),
-      v({ prefixo: "EB3412229945", chassi: "9BYU43159EC001942", tipo: "leve", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2013, situacao: "operacional", km: 106672 }),
-      v({ prefixo: "EB3412229933", chassi: "9BYU43159EC001952", tipo: "leve", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2013, situacao: "manutencao", km: 0, observacoes: "Motivo: limpeza nos bicos." }),
-      v({ prefixo: "EB3412015139", chassi: "9BYU43159GC002719", tipo: "leve", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2016, situacao: "manutencao", km: 79696, observacoes: "Motivo: alternador." }),
-      v({ prefixo: "EB3412511029", chassi: "9BYCAAA2CJC000013", tipo: "leve", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2018, situacao: "operacional", km: 52141 }),
-      v({ prefixo: "EB3412511031", chassi: "9BYCAAA2CJC000012", tipo: "leve", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2019, situacao: "manutencao", km: 23418, observacoes: "Motivo: sensor de temperatura." }),
-      v({ prefixo: "EB3417283183", chassi: "9A9R0421DECEM5542", tipo: "outro", modelo: "Cisterna Morumbi (reboque)", ano: 2013, situacao: "manutencao", km: 0, observacoes: "Motivo: interior enferrujado; sistema de freio danificado. Serviços necessários: revitalização completa (qtd 1); revisão do sistema de freio (qtd 1)." }),
+      v({ prefixo: "EB3412201012", chassi: "9BYU43159EC002525", tipo: "marrua", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2014, situacao: "operacional", km: 51717 }),
+      v({ prefixo: "EB3412201289", chassi: "9BYU43159EC002526", tipo: "marrua", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2014, situacao: "operacional", km: 58498 }),
+      v({ prefixo: "EB3412229960", chassi: "9BYU43159EC001939", tipo: "marrua", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2013, situacao: "operacional", km: 75333 }),
+      v({ prefixo: "EB3412229958", chassi: "9BYU43159EC001940", tipo: "marrua", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2013, situacao: "manutencao", km: 96941, observacoes: "Motivo: diferencial dianteiro — parafuso de fixação da tampa quebrou dentro." }),
+      v({ prefixo: "EB3412229945", chassi: "9BYU43159EC001942", tipo: "marrua", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2013, situacao: "operacional", km: 106672 }),
+      v({ prefixo: "EB3412229933", chassi: "9BYU43159EC001952", tipo: "marrua", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2013, situacao: "manutencao", km: 0, observacoes: "Motivo: limpeza nos bicos." }),
+      v({ prefixo: "EB3412015139", chassi: "9BYU43159GC002719", tipo: "marrua", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2016, situacao: "manutencao", km: 79696, observacoes: "Motivo: alternador." }),
+      v({ prefixo: "EB3412511029", chassi: "9BYCAAA2CJC000013", tipo: "marrua", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2018, situacao: "operacional", km: 52141 }),
+      v({ prefixo: "EB3412511031", chassi: "9BYCAAA2CJC000012", tipo: "marrua", modelo: "Agrale Marruá AM20 (¾ Ton)", ano: 2019, situacao: "manutencao", km: 23418, observacoes: "Motivo: sensor de temperatura." }),
+      v({ prefixo: "EB3417283183", chassi: "9A9R0421DECEM5542", tipo: "reboque", modelo: "Cisterna Morumbi (reboque)", ano: 2013, situacao: "manutencao", km: 0, observacoes: "Motivo: interior enferrujado; sistema de freio danificado. Serviços necessários: revitalização completa (qtd 1); revisão do sistema de freio (qtd 1)." }),
       v({ prefixo: "EB3471510235", chassi: "8AD4D5GVUJG014795", tipo: "leve", modelo: "Peugeot 408", ano: 2018, situacao: "operacional", km: 59523, observacoes: "Motivo: ar-condicionado não funciona. Peça necessária: compressor do ar-condicionado (qtd 1)." }),
       v({ prefixo: "EB3471279400", chassi: "9532J82Z0DR334302", tipo: "onibus", modelo: "Volkswagen Mascarello (Ônibus Rodoviário)", ano: 2013, situacao: "manutencao", km: 69886, observacoes: "Motivo: painel queimado." }),
-      v({ prefixo: "EB3472207778", chassi: "93ZC42C01D8450790", tipo: "caminhao", modelo: "Iveco Daily 45S17", ano: 2013, situacao: "manutencao", km: 0, observacoes: "Motivo: sensor de óleo." }),
+      v({ prefixo: "EB3472207778", chassi: "93ZC42C01D8450790", tipo: "5ton", modelo: "Iveco Daily 45S17", ano: 2013, situacao: "manutencao", km: 0, observacoes: "Motivo: sensor de óleo." }),
       v({ prefixo: "EB3472533256", chassi: "8ANBD33B1NL131968", tipo: "leve", modelo: "Nissan Frontier", ano: 2021, situacao: "operacional", km: 43526 }),
-      v({ prefixo: "EB3473034338", chassi: "93ZK42C01J8481341", tipo: "caminhao", modelo: "Iveco Daily 45S17", ano: 2018, situacao: "manutencao", km: 0, observacoes: "Motivo: luva do cardã não encaixa." }),
+      v({ prefixo: "EB3473034338", chassi: "93ZK42C01J8481341", tipo: "5ton", modelo: "Iveco Daily 45S17", ano: 2018, situacao: "manutencao", km: 0, observacoes: "Motivo: luva do cardã não encaixa." }),
       v({ prefixo: "RZC9J14", chassi: "93YF62S03TJ211631", tipo: "leve", modelo: "Renault Ambulância", ano: 2025, situacao: "operacional", km: 0 }),
-      v({ prefixo: "EB3471548781", chassi: "93ZC642BZS8206713", tipo: "caminhao", modelo: "Iveco Daily 45-160", ano: 2024, situacao: "operacional", km: 13274 })
+      v({ prefixo: "EB3471548781", chassi: "93ZC642BZS8206713", tipo: "5ton", modelo: "Iveco Daily 45-160", ano: 2024, situacao: "operacional", km: 13274 })
     ];
   }
 
