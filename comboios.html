@@ -469,31 +469,39 @@
   }
 
   function renderCalcResult() {
-    var transporteList = disponiveis.filter(function (v) { return entryFor(v).assign === "transporte"; });
-    var nOnibus = transporteList.filter(function (v) { return v.tipo === "onibus"; }).length;
-    var n5ton = transporteList.filter(function (v) { return v.tipo === "5ton"; }).length;
-    var capMin = nOnibus * calc.onibus + n5ton * calc.min5;
-    var capMax = nOnibus * calc.onibus + n5ton * calc.max5;
+    // 5 Ton e ônibus contam como capacidade de transporte onde quer que estejam
+    // (inclusive "emprestados" para o Comboio 1, viajando na formação do desfile).
+    var emUso = disponiveis.filter(function (v) { var a = entryFor(v).assign; return a === "transporte" || a === "desfile"; });
+    var nOnibus = emUso.filter(function (v) { return v.tipo === "onibus"; }).length;
+    var n5tonTransporte = emUso.filter(function (v) { return v.tipo === "5ton" && entryFor(v).assign === "transporte"; }).length;
+    var n5tonDesfile = emUso.filter(function (v) { return v.tipo === "5ton" && entryFor(v).assign === "desfile"; }).length;
+    var n5tonTotal = n5tonTransporte + n5tonDesfile;
+    var capMin = nOnibus * calc.onibus + n5tonTotal * calc.min5;
+    var capMax = nOnibus * calc.onibus + n5tonTotal * calc.max5;
     var efetivo = calc.efetivo;
 
     var html = '<div class="calc-summary">' +
-      '<div class="calc-stat">Ônibus no Comboio 2<strong class="tabular">' + nOnibus + '</strong></div>' +
-      '<div class="calc-stat">5 Ton no Comboio 2<strong class="tabular">' + n5ton + '</strong></div>' +
+      '<div class="calc-stat">Ônibus (Comboio 2)<strong class="tabular">' + nOnibus + '</strong></div>' +
+      '<div class="calc-stat">5 Ton no Comboio 2<strong class="tabular">' + n5tonTransporte + '</strong></div>' +
+      '<div class="calc-stat">5 Ton no Comboio 1 (desfile)<strong class="tabular">' + n5tonDesfile + '</strong></div>' +
       '<div class="calc-stat">Capacidade estimada<strong class="tabular">' + capMin + (capMax !== capMin ? '–' + capMax : '') + ' pessoal</strong></div>' +
       '</div>';
 
     if (efetivo <= capMin) {
       var folga = capMin - efetivo;
       html += '<div class="calc-badge ok">✓ Capacidade suficiente para ' + efetivo + ' militares</div>' +
-        '<p class="calc-note">Mesmo no pior caso (' + calc.min5 + ' por 5 Ton), sobram ' + folga + ' vaga(s). Não é necessário remanejar viaturas do Comboio 1.</p>';
+        '<p class="calc-note">Mesmo no pior caso (' + calc.min5 + ' por 5 Ton), sobram ' + folga + ' vaga(s).' +
+        (n5tonDesfile ? ' Os ' + n5tonDesfile + ' 5 Ton do Comboio 1 precisam de chefe de vtr, motorista e 2 militares armados, como as demais viaturas do desfile.' : '') + '</p>';
     } else {
       var falta = efetivo - capMin;
+      var ton5NecessariosExtra = Math.ceil(falta / calc.min5);
+      var ton5ForaDeUso = disponiveis.filter(function (v) { return v.tipo === "5ton" && entryFor(v).assign === "none"; }).length;
       var marruasNecessarias = calc.marrua > 0 ? Math.ceil(falta / calc.marrua) : 0;
       var marruasNoDesfile = disponiveis.filter(function (v) { return entryFor(v).assign === "desfile" && v.tipo === "marrua"; }).length;
       html += '<div class="calc-badge bad">⚠ Faltam ' + falta + ' vaga(s) (pior caso) para ' + efetivo + ' militares</div>' +
-        '<p class="calc-note">Sugestão: remaneje ' + marruasNecessarias + ' Marruá(s) do Comboio 1 para o Comboio 2 (estimando ' + calc.marrua + ' pessoal/Marruá — ajuste o campo acima). ' +
-        'Há ' + marruasNoDesfile + ' Marruá(s) no Comboio 1 hoje' +
-        (marruasNoDesfile < marruasNecessarias ? ' — não é suficiente sozinho; considere também viaturas leves ou outro meio de transporte.' : '.') + '</p>';
+        '<p class="calc-note">Sugestão: passe mais ' + ton5NecessariosExtra + ' 5 Ton para o Comboio 1 (desfile) na tabela "Frota disponível" abaixo — cada um com chefe de vtr, motorista e 2 militares armados, além dos passageiros. ' +
+        'Há ' + ton5ForaDeUso + ' 5 Ton fora de uso (não incluído) hoje' +
+        (ton5ForaDeUso < ton5NecessariosExtra ? ' — não é suficiente sozinho; considere também ' + marruasNecessarias + ' Marruá(s) (há ' + marruasNoDesfile + ' no Comboio 1) ou outro meio de transporte.' : '.') + '</p>';
     }
     $("#calc-result").innerHTML = html;
   }
