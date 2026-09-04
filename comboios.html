@@ -155,6 +155,8 @@
   }
   input[type=text]::placeholder { color: var(--muted); }
   .assign-select { min-width: 190px; }
+  .qtd-col { width: 90px; }
+  input.qtd-input { min-width: 64px; text-align: right; }
 
   .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
   .badge.desfile { background: var(--accent-wash); color: var(--accent); }
@@ -169,7 +171,9 @@
   .calc-badge { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-weight: 700; font-size: 13.5px; }
   .calc-badge.ok { background: var(--good-wash); color: var(--good); }
   .calc-badge.bad { background: var(--critical-wash); color: var(--critical); }
+  .calc-badge:not(.ok):not(.bad) { background: var(--surface-2); color: var(--muted); }
   .calc-note { font-size: 12.5px; color: var(--ink-2); margin-top: 8px; }
+  .calc-fechamento { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
 
   .table-foot { padding: 9px 12px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); }
   .empty-mini { padding: 24px; text-align: center; color: var(--muted); font-size: 13px; }
@@ -239,6 +243,7 @@
               <th>Viatura</th>
               <th>Chefe de Vtr</th>
               <th>Motorista</th>
+              <th class="qtd-col">Qtd militares</th>
             </tr>
           </thead>
           <tbody id="tbody-transporte"></tbody>
@@ -260,6 +265,7 @@
               <th>Motorista</th>
               <th>Militar armado 1</th>
               <th>Militar armado 2</th>
+              <th class="qtd-col">Qtd militares</th>
             </tr>
           </thead>
           <tbody id="tbody-desfile"></tbody>
@@ -388,8 +394,9 @@
 
   function entryFor(v) {
     if (!plan[v.id]) {
-      plan[v.id] = { assign: DEFAULT_ASSIGN[v.tipo] || "none", chefe: "", motorista: "", arm1: "", arm2: "" };
+      plan[v.id] = { assign: DEFAULT_ASSIGN[v.tipo] || "none", chefe: "", motorista: "", arm1: "", arm2: "", qtd: "" };
     }
+    if (plan[v.id].qtd === undefined) plan[v.id].qtd = "";
     return plan[v.id];
   }
   disponiveis.forEach(entryFor);
@@ -435,9 +442,13 @@
       (indispCount ? " · " + indispCount + " indisponível/em manutenção (não listada)" : "");
   }
 
-  function fieldTd(id, field, value, placeholder) {
-    return '<td><input type="text" data-id="' + id + '" data-field="' + field + '" value="' +
-      escapeHtml(value) + '" placeholder="' + placeholder + '"></td>';
+  function fieldTd(id, field, value, placeholder, opts) {
+    opts = opts || {};
+    var type = opts.number ? "number" : "text";
+    var cls = opts.number ? ' class="qtd-input tabular"' : "";
+    var extra = opts.number ? ' min="0" step="1"' : "";
+    return '<td><input type="' + type + '"' + cls + ' data-id="' + id + '" data-field="' + field + '" value="' +
+      escapeHtml(value) + '" placeholder="' + placeholder + '"' + extra + '></td>';
   }
 
   function renderComboio(assignKey, tbodySel, emptySel, fields) {
@@ -452,7 +463,7 @@
       var tds = '<td class="ord tabular">' + (i + 1) + '</td>' +
         '<td><div class="veh-id"><span class="prefixo">' + escapeHtml(v.prefixo || "—") + '</span>' +
         '<div class="modelo">' + escapeHtml((TIPO_LABEL[v.tipo] || "Outro") + (v.modelo ? " · " + v.modelo : "")) + '</div></div></td>';
-      fields.forEach(function (f) { tds += fieldTd(v.id, f.key, e[f.key], f.placeholder); });
+      fields.forEach(function (f) { tds += fieldTd(v.id, f.key, e[f.key], f.placeholder, { number: f.number }); });
       tr.innerHTML = tds;
       tbody.appendChild(tr);
     });
@@ -503,6 +514,26 @@
         'Há ' + ton5ForaDeUso + ' 5 Ton fora de uso (não incluído) hoje' +
         (ton5ForaDeUso < ton5NecessariosExtra ? ' — não é suficiente sozinho; considere também ' + marruasNecessarias + ' Marruá(s) (há ' + marruasNoDesfile + ' no Comboio 1) ou outro meio de transporte.' : '.') + '</p>';
     }
+
+    var lancado = disponiveis.reduce(function (sum, v) {
+      var a = entryFor(v).assign;
+      if (a !== "transporte" && a !== "desfile") return sum;
+      return sum + (parseInt(entryFor(v).qtd, 10) || 0);
+    }, 0);
+    var diff = efetivo - lancado;
+    html += '<div class="calc-fechamento">' +
+      '<div class="calc-stat">Lançado na coluna "Qtd militares"<strong class="tabular">' + lancado + '</strong></div>';
+    if (diff === 0 && lancado > 0) {
+      html += '<div class="calc-badge ok">✓ Fecha com o efetivo (' + efetivo + ')</div>';
+    } else if (lancado === 0) {
+      html += '<div class="calc-badge">Ainda sem lançamentos — preencha a coluna "Qtd militares" em cada viatura</div>';
+    } else if (diff > 0) {
+      html += '<div class="calc-badge bad">⚠ Faltam lançar ' + diff + ' militar(es)</div>';
+    } else {
+      html += '<div class="calc-badge bad">⚠ ' + (-diff) + ' militar(es) a mais do que o efetivo (' + efetivo + ')</div>';
+    }
+    html += '</div>';
+
     $("#calc-result").innerHTML = html;
   }
 
@@ -524,11 +555,13 @@
       { key: "chefe", placeholder: "Nome do Chefe de Vtr" },
       { key: "motorista", placeholder: "Nome do motorista" },
       { key: "arm1", placeholder: "Militar armado 1" },
-      { key: "arm2", placeholder: "Militar armado 2" }
+      { key: "arm2", placeholder: "Militar armado 2" },
+      { key: "qtd", placeholder: "Qtd", number: true }
     ]);
     renderComboio("transporte", "#tbody-transporte", "#empty-transporte", [
       { key: "chefe", placeholder: "Nome do Chefe de Vtr" },
-      { key: "motorista", placeholder: "Nome do motorista" }
+      { key: "motorista", placeholder: "Nome do motorista" },
+      { key: "qtd", placeholder: "Qtd", number: true }
     ]);
     renderKpis();
     renderCalcResult();
@@ -547,7 +580,7 @@
     if (sel) {
       var id = sel.getAttribute("data-id");
       entryFor({ id: id }); // no-op guard; entry already exists for known ids
-      if (!plan[id]) plan[id] = { assign: "none", chefe: "", motorista: "", arm1: "", arm2: "" };
+      if (!plan[id]) plan[id] = { assign: "none", chefe: "", motorista: "", arm1: "", arm2: "", qtd: "" };
       plan[id].assign = sel.value;
       persistPlan();
       renderAll();
@@ -560,9 +593,10 @@
     if (!inp) return;
     var id = inp.getAttribute("data-id");
     var field = inp.getAttribute("data-field");
-    if (!plan[id]) plan[id] = { assign: "none", chefe: "", motorista: "", arm1: "", arm2: "" };
+    if (!plan[id]) plan[id] = { assign: "none", chefe: "", motorista: "", arm1: "", arm2: "", qtd: "" };
     plan[id][field] = inp.value;
     persistPlan();
+    if (field === "qtd") renderCalcResult();
   });
 
   $("#btn-print").addEventListener("click", function () { window.print(); });
