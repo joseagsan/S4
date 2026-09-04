@@ -25,6 +25,10 @@ estático). Não há passo de instalação.
   transferência entre dispositivos).
 - Carga inicial com 36 viaturas de exemplo da planilha de controle da frota
   (apenas na primeira execução, quando não há dados salvos no navegador).
+- `comboios.html`: planejamento dos comboios do desfile a partir da mesma
+  frota (viaturas com situação "Disponível"). Comboio 1 — desfile motorizado
+  (chefe de vtr, motorista e 2 militares armados por viatura) e Comboio 2 —
+  transporte de pessoal para o desfile, com campos para preencher os nomes.
 
 ## Dados
 
