@@ -481,6 +481,37 @@
 
   function vtrAtualDe(p) { return posicoes[p.id] || p.vtrPadrao; }
 
+  // ordem de precedência (posto/graduação), do mais antigo pro mais moderno
+  var ORDEM_POSTO = [
+    [/^TC\b/, 0],
+    [/^MAJ\b/, 1],
+    [/^CAP\b/, 2],
+    [/^1\s*º?\s*TEN\b/, 3],
+    [/^2\s*º?\s*TEN\b/, 5],
+    [/^TEN\b/, 4],
+    [/^ST\b/, 6],
+    [/^1\s*º?\s*SGT\b/, 7],
+    [/^2\s*º?\s*SGT\b/, 8],
+    [/^3\s*º?\s*SGT\b/, 9],
+    [/^SGT\b/, 8],
+    [/^CB\b/, 10],
+    [/^AS\b/, 11],
+    [/^SDD?\b/, 12],
+    [/^AL\b/, 13]
+  ];
+  function ordemPosto(nome) {
+    var n = nome.toUpperCase();
+    for (var i = 0; i < ORDEM_POSTO.length; i++) {
+      if (ORDEM_POSTO[i][0].test(n)) return ORDEM_POSTO[i][1];
+    }
+    return 14;
+  }
+  function ordenarPorPosto(lista) {
+    return lista.map(function (p, i) { return { p: p, i: i }; })
+      .sort(function (a, b) { return ordemPosto(a.p.nome) - ordemPosto(b.p.nome) || a.i - b.i; })
+      .map(function (x) { return x.p; });
+  }
+
   function moveOptionsHtml(selecionado) {
     return VEICULOS.map(function (v) {
       return '<option value="' + v.id + '"' + (v.id === selecionado ? " selected" : "") + '>' + escapeHtml(v.label) + '</option>';
@@ -493,7 +524,7 @@
     var totalConfirmados = 0, viaturasComPessoal = 0, semPax = 0;
 
     VEICULOS.forEach(function (v) {
-      var ocupantes = PESSOAS.filter(function (p) { return vtrAtualDe(p) === v.id; });
+      var ocupantes = ordenarPorPosto(PESSOAS.filter(function (p) { return vtrAtualDe(p) === v.id; }));
       if (ocupantes.length) viaturasComPessoal++; else semPax++;
 
       var card = document.createElement("div");
