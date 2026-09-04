@@ -149,7 +149,7 @@
   .veh-id .modelo { font-size: 11.5px; color: var(--muted); }
   .ord { color: var(--muted); font-weight: 700; width: 28px; }
 
-  input[type=text], select {
+  input[type=text], input[type=number], select {
     font: inherit; background: var(--surface); color: var(--ink); border: 1px solid var(--border);
     border-radius: 7px; padding: 7px 9px; font-size: 13px; width: 100%; min-width: 130px;
   }
@@ -160,6 +160,16 @@
   .badge.desfile { background: var(--accent-wash); color: var(--accent); }
   .badge.transporte { background: var(--good-wash); color: var(--good); }
   .badge.none { background: var(--surface-2); color: var(--muted); }
+
+  .calc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 14px; }
+  .calc-field label { display: block; font-size: 11.5px; font-weight: 700; color: var(--ink-2); margin-bottom: 4px; }
+  .calc-summary { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .calc-stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; font-size: 12px; color: var(--ink-2); min-width: 140px; }
+  .calc-stat strong { display: block; font-size: 18px; color: var(--ink); margin-top: 2px; }
+  .calc-badge { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-weight: 700; font-size: 13.5px; }
+  .calc-badge.ok { background: var(--good-wash); color: var(--good); }
+  .calc-badge.bad { background: var(--critical-wash); color: var(--critical); }
+  .calc-note { font-size: 12.5px; color: var(--ink-2); margin-top: 8px; }
 
   .table-foot { padding: 9px 12px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); }
   .empty-mini { padding: 24px; text-align: center; color: var(--muted); font-size: 13px; }
@@ -184,7 +194,7 @@
       <div>
         <p class="eyebrow">Função S4 · Logística</p>
         <h1>Planejamento de Comboios — Desfile</h1>
-        <p class="sub">Comboio 1: desfile motorizado (chefe de vtr + motorista + 2 militares armados por viatura). Comboio 2: transporte de pessoal para o desfile.</p>
+        <p class="sub">Ordem de deslocamento da coluna: Comboio 2 — transporte de pessoal (5 Ton + ônibus) à frente, seguido do Comboio 1 — desfile motorizado (chefe de vtr + motorista + 2 militares armados por viatura).</p>
       </div>
       <div class="actions no-print">
         <a href="index.html"><button class="ghost" type="button">← Controle de viaturas</button></a>
@@ -196,16 +206,6 @@
     <div class="banner" id="source-banner" hidden></div>
 
     <div class="kpis">
-      <div class="kpi" style="--kpi-c: var(--accent)">
-        <div class="label">Vtrs — Desfile motorizado</div>
-        <div class="value tabular" id="kpi-desfile">0</div>
-        <div class="note" id="kpi-desfile-note">&nbsp;</div>
-      </div>
-      <div class="kpi" style="--kpi-c: var(--accent)">
-        <div class="label">Efetivo p/ comboio (tripulação)</div>
-        <div class="value tabular" id="kpi-desfile-efetivo">0</div>
-        <div class="note">chefe + motorista + 2 armados, por vtr</div>
-      </div>
       <div class="kpi" style="--kpi-c: var(--good)">
         <div class="label">Vtrs — Transporte de pessoal</div>
         <div class="value tabular" id="kpi-transporte">0</div>
@@ -216,11 +216,40 @@
         <div class="value tabular" id="kpi-transporte-efetivo">0</div>
         <div class="note">chefe + motorista, por vtr</div>
       </div>
+      <div class="kpi" style="--kpi-c: var(--accent)">
+        <div class="label">Vtrs — Desfile motorizado</div>
+        <div class="value tabular" id="kpi-desfile">0</div>
+        <div class="note" id="kpi-desfile-note">&nbsp;</div>
+      </div>
+      <div class="kpi" style="--kpi-c: var(--accent)">
+        <div class="label">Efetivo p/ comboio (tripulação)</div>
+        <div class="value tabular" id="kpi-desfile-efetivo">0</div>
+        <div class="note">chefe + motorista + 2 armados, por vtr</div>
+      </div>
     </div>
 
     <div class="panel">
-      <h2>Comboio 1 — Desfile motorizado</h2>
-      <p class="panel-sub">Preencha o nome do Chefe de Vtr, do motorista e dos 2 militares armados de cada viatura.</p>
+      <h2>Comboio 2 — Transporte de pessoal <span class="badge transporte">1º na coluna</span></h2>
+      <p class="panel-sub">Viaturas destinadas a levar o efetivo até o local do desfile. Seguem à frente na coluna de deslocamento.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="ord">Ord</th>
+              <th>Viatura</th>
+              <th>Chefe de Vtr</th>
+              <th>Motorista</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-transporte"></tbody>
+        </table>
+        <div class="empty-mini" id="empty-transporte" hidden>Nenhuma viatura atribuída a este comboio. Ajuste o comboio de cada viatura na tabela "Frota disponível" abaixo.</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Comboio 1 — Desfile motorizado <span class="badge desfile">2º na coluna</span></h2>
+      <p class="panel-sub">Preencha o nome do Chefe de Vtr, do motorista e dos 2 militares armados de cada viatura. Desloca-se atrás do Comboio 2.</p>
       <div class="table-wrap">
         <table>
           <thead>
@@ -240,22 +269,16 @@
     </div>
 
     <div class="panel">
-      <h2>Comboio 2 — Transporte de pessoal</h2>
-      <p class="panel-sub">Viaturas destinadas a levar o efetivo até o local do desfile.</p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th class="ord">Ord</th>
-              <th>Viatura</th>
-              <th>Chefe de Vtr</th>
-              <th>Motorista</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-transporte"></tbody>
-        </table>
-        <div class="empty-mini" id="empty-transporte" hidden>Nenhuma viatura atribuída a este comboio. Ajuste o comboio de cada viatura na tabela "Frota disponível" abaixo.</div>
+      <h2>Necessidade de transporte de pessoal</h2>
+      <p class="panel-sub">Compara o efetivo a transportar com a capacidade das viaturas já atribuídas ao Comboio 2. Recalcula sozinho se você mudar o comboio de alguma viatura.</p>
+      <div class="calc-grid no-print">
+        <div class="calc-field"><label for="calc-efetivo">Efetivo a transportar</label><input type="number" id="calc-efetivo" min="0" step="1"></div>
+        <div class="calc-field"><label for="calc-onibus">Pessoal por ônibus</label><input type="number" id="calc-onibus" min="0" step="1"></div>
+        <div class="calc-field"><label for="calc-5ton-min">Pessoal por 5 Ton (mín.)</label><input type="number" id="calc-5ton-min" min="0" step="1"></div>
+        <div class="calc-field"><label for="calc-5ton-max">Pessoal por 5 Ton (máx.)</label><input type="number" id="calc-5ton-max" min="0" step="1"></div>
+        <div class="calc-field"><label for="calc-marrua">Pessoal por Marruá (se precisar puxar do desfile)</label><input type="number" id="calc-marrua" min="0" step="1"></div>
       </div>
+      <div id="calc-result"></div>
     </div>
 
     <div class="panel no-print">
@@ -435,6 +458,46 @@
     });
   }
 
+  var CALC_DEFAULTS = { efetivo: 210, onibus: 34, min5: 20, max5: 25, marrua: 10 };
+  var CALC_FIELDS = { "calc-efetivo": "efetivo", "calc-onibus": "onibus", "calc-5ton-min": "min5", "calc-5ton-max": "max5", "calc-marrua": "marrua" };
+  var calc = Object.assign({}, CALC_DEFAULTS, plan._calc || {});
+
+  function persistCalc() { plan._calc = calc; persistPlan(); }
+
+  function fillCalcInputs() {
+    Object.keys(CALC_FIELDS).forEach(function (id) { $("#" + id).value = calc[CALC_FIELDS[id]]; });
+  }
+
+  function renderCalcResult() {
+    var transporteList = disponiveis.filter(function (v) { return entryFor(v).assign === "transporte"; });
+    var nOnibus = transporteList.filter(function (v) { return v.tipo === "onibus"; }).length;
+    var n5ton = transporteList.filter(function (v) { return v.tipo === "5ton"; }).length;
+    var capMin = nOnibus * calc.onibus + n5ton * calc.min5;
+    var capMax = nOnibus * calc.onibus + n5ton * calc.max5;
+    var efetivo = calc.efetivo;
+
+    var html = '<div class="calc-summary">' +
+      '<div class="calc-stat">Ônibus no Comboio 2<strong class="tabular">' + nOnibus + '</strong></div>' +
+      '<div class="calc-stat">5 Ton no Comboio 2<strong class="tabular">' + n5ton + '</strong></div>' +
+      '<div class="calc-stat">Capacidade estimada<strong class="tabular">' + capMin + (capMax !== capMin ? '–' + capMax : '') + ' pessoal</strong></div>' +
+      '</div>';
+
+    if (efetivo <= capMin) {
+      var folga = capMin - efetivo;
+      html += '<div class="calc-badge ok">✓ Capacidade suficiente para ' + efetivo + ' militares</div>' +
+        '<p class="calc-note">Mesmo no pior caso (' + calc.min5 + ' por 5 Ton), sobram ' + folga + ' vaga(s). Não é necessário remanejar viaturas do Comboio 1.</p>';
+    } else {
+      var falta = efetivo - capMin;
+      var marruasNecessarias = calc.marrua > 0 ? Math.ceil(falta / calc.marrua) : 0;
+      var marruasNoDesfile = disponiveis.filter(function (v) { return entryFor(v).assign === "desfile" && v.tipo === "marrua"; }).length;
+      html += '<div class="calc-badge bad">⚠ Faltam ' + falta + ' vaga(s) (pior caso) para ' + efetivo + ' militares</div>' +
+        '<p class="calc-note">Sugestão: remaneje ' + marruasNecessarias + ' Marruá(s) do Comboio 1 para o Comboio 2 (estimando ' + calc.marrua + ' pessoal/Marruá — ajuste o campo acima). ' +
+        'Há ' + marruasNoDesfile + ' Marruá(s) no Comboio 1 hoje' +
+        (marruasNoDesfile < marruasNecessarias ? ' — não é suficiente sozinho; considere também viaturas leves ou outro meio de transporte.' : '.') + '</p>';
+    }
+    $("#calc-result").innerHTML = html;
+  }
+
   function renderKpis() {
     var nDesfile = disponiveis.filter(function (v) { return entryFor(v).assign === "desfile"; }).length;
     var nTransporte = disponiveis.filter(function (v) { return entryFor(v).assign === "transporte"; }).length;
@@ -460,7 +523,16 @@
       { key: "motorista", placeholder: "Nome do motorista" }
     ]);
     renderKpis();
+    renderCalcResult();
   }
+
+  Object.keys(CALC_FIELDS).forEach(function (id) {
+    $("#" + id).addEventListener("input", function (e) {
+      calc[CALC_FIELDS[id]] = parseInt(e.target.value, 10) || 0;
+      persistCalc();
+      renderCalcResult();
+    });
+  });
 
   document.addEventListener("change", function (e) {
     var sel = e.target.closest("select.assign-select");
@@ -497,6 +569,7 @@
     renderAll();
   });
 
+  fillCalcInputs();
   renderAll();
 })();
 </script>
