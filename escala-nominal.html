@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escala Nominal — Comboios do Desfile</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page:      #eff2ee;
+    --surface:   #ffffff;
+    --surface-2: #f7f9f5;
+    --ink:       #14201c;
+    --ink-2:     #4b564f;
+    --muted:     #838f86;
+    --border:    #d7ded8;
+    --grid:      #e3e8e1;
+    --accent:    #2a78d6;
+    --accent-ink:#ffffff;
+    --accent-wash: #e4eefb;
+    --good:      #0ca30c;
+    --good-wash: #e2f5df;
+    --warning:   #b8790a;
+    --warning-wash: #faf0da;
+    --critical:  #d03b3b;
+    --critical-wash: #fbe6e4;
+    --shadow: 0 1px 2px rgba(20,32,28,0.06), 0 8px 24px -12px rgba(20,32,28,0.18);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page:      #0e1512; --surface:   #16201c; --surface-2: #192622;
+      --ink:       #eaefea; --ink-2:     #a8b3ab; --muted:     #7c877e;
+      --border:    #29332d; --grid:      #26302a;
+      --accent:    #3987e5; --accent-ink:#08121e; --accent-wash: #16273b;
+      --good:      #35c24a; --good-wash: #123821;
+      --warning:   #e0a83e; --warning-wash: #3a2c0f;
+      --critical:  #e0645c; --critical-wash: #3b1917;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page:      #0e1512; --surface:   #16201c; --surface-2: #192622;
+    --ink:       #eaefea; --ink-2:     #a8b3ab; --muted:     #7c877e;
+    --border:    #29332d; --grid:      #26302a;
+    --accent:    #3987e5; --accent-ink:#08121e; --accent-wash: #16273b;
+    --good:      #35c24a; --good-wash: #123821;
+    --warning:   #e0a83e; --warning-wash: #3a2c0f;
+    --critical:  #e0645c; --critical-wash: #3b1917;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.55);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { background: var(--page); }
+  body { margin: 0; }
+  .app {
+    background: var(--page); color: var(--ink);
+    font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    min-height: 100%; padding: 20px 20px 64px; line-height: 1.45;
+  }
+  .app h1, .app h2, .app h3 {
+    font-family: "Bahnschrift", "Segoe UI Semibold", "Arial Narrow", ui-sans-serif, sans-serif;
+    font-weight: 700; letter-spacing: 0.01em; text-wrap: balance; margin: 0;
+  }
+  .mono, .tabular { font-variant-numeric: tabular-nums; }
+  a { color: var(--accent); }
+
+  .shell { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .topbar .eyebrow { text-transform: uppercase; letter-spacing: 0.09em; font-size: 11px; font-weight: 700; color: var(--accent); margin: 0 0 4px; }
+  .topbar h1 { font-size: 24px; }
+  .topbar .sub { color: var(--ink-2); font-size: 13.5px; margin-top: 4px; }
+  .topbar .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  button {
+    font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--ink); padding: 9px 14px; font-size: 13.5px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 6px; transition: background .12s, border-color .12s, transform .05s;
+  }
+  button:hover { border-color: var(--accent); }
+  button:active { transform: translateY(1px); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  button.ghost { background: transparent; }
+
+  .banner {
+    background: var(--accent-wash); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 10px 14px; font-size: 13px; color: var(--ink-2);
+  }
+  .banner strong { color: var(--ink); }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media (max-width: 760px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px 16px; box-shadow: var(--shadow); position: relative; overflow: hidden;
+  }
+  .kpi::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--kpi-c, var(--accent)); }
+  .kpi .label { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; }
+  .kpi .value { font-size: 26px; font-weight: 700; margin-top: 4px; }
+  .kpi .note { font-size: 12px; color: var(--ink-2); margin-top: 2px; }
+
+  .veic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  .veic {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column;
+    break-inside: avoid;
+  }
+  .veic-head { padding: 12px 14px; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+  .veic-head h3 { font-size: 14px; }
+  .veic-head .tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-top: 2px; }
+  .veic-head .tag.sem { color: var(--muted); }
+  .veic-head .count { float: right; font-size: 12px; color: var(--muted); font-weight: 700; }
+  .veic-list { list-style: none; margin: 0; padding: 6px 0; max-height: none; }
+  .veic-list li {
+    display: flex; align-items: center; gap: 8px; padding: 5px 14px; font-size: 12.5px; border-bottom: 1px solid var(--grid);
+  }
+  .veic-list li:last-child { border-bottom: none; }
+  .veic-list .nr { color: var(--muted); width: 20px; flex: none; text-align: right; font-size: 11px; }
+  .veic-list .nome { flex: 1; }
+  .veic-list .grupo-tag { font-size: 10px; color: var(--muted); background: var(--surface-2); border-radius: 4px; padding: 1px 6px; flex: none; }
+  .veic-list li.checked .nome { text-decoration: line-through; color: var(--muted); }
+  .veic-empty { padding: 14px; font-size: 12.5px; color: var(--muted); font-style: italic; }
+  input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--accent); flex: none; }
+
+  footer.appfoot { margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
+
+  @media print {
+    .no-print { display: none !important; }
+    body, .app { background: #fff; }
+    .veic, .kpi { box-shadow: none; border: 1px solid #999; }
+    .veic-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <div class="shell">
+
+    <div class="topbar">
+      <div>
+        <p class="eyebrow">Função S4 · Logística</p>
+        <h1>Escala Nominal — Comboios do Desfile</h1>
+        <p class="sub">EM, Bloco 1, Bloco 2, Bloco 3, Equipe ST/Apoio, RP e Bandeiras Históricas, divididos por viatura. Oficiais e sargentos priorizados no ônibus.</p>
+      </div>
+      <div class="actions no-print">
+        <a href="comboios.html"><button class="ghost" type="button">← Comboios</button></a>
+        <button class="ghost" id="btn-reset" type="button">Limpar chamada</button>
+        <button class="primary" id="btn-print" type="button">Imprimir / PDF</button>
+      </div>
+    </div>
+
+    <div class="banner">
+      Fonte: planilha de blocos do desfile (7 Set 2026). CMT (TC Felipe Honorato) vai em viatura própria, fora desta lista. As checkboxes marcam presença/embarque e ficam salvas neste navegador.
+    </div>
+
+    <div class="kpis">
+      <div class="kpi" style="--kpi-c: var(--accent)">
+        <div class="label">Total escalado</div>
+        <div class="value tabular" id="kpi-total">0</div>
+        <div class="note">militares nas viaturas abaixo</div>
+      </div>
+      <div class="kpi" style="--kpi-c: var(--good)">
+        <div class="label">Confirmados (embarcados)</div>
+        <div class="value tabular" id="kpi-confirmados">0</div>
+        <div class="note" id="kpi-confirmados-note">&nbsp;</div>
+      </div>
+      <div class="kpi" style="--kpi-c: var(--accent)">
+        <div class="label">Viaturas com pessoal</div>
+        <div class="value tabular" id="kpi-viaturas">0</div>
+        <div class="note">1 ônibus + 3 5Ton transporte + 5 5Ton desfile</div>
+      </div>
+      <div class="kpi" style="--kpi-c: var(--muted)">
+        <div class="label">5Ton do desfile só guarnição</div>
+        <div class="value tabular" id="kpi-sem-pax">0</div>
+        <div class="note">sem passageiro extra</div>
+      </div>
+    </div>
+
+    <div class="veic-grid" id="veic-grid"></div>
+
+    <footer class="appfoot">
+      <span>As marcações de presença ficam salvas apenas neste navegador (armazenamento local).</span>
+      <span>Ver também: <a href="comboios.html">Planejamento de Comboios</a> · <a href="index.html">Controle de Viaturas</a></span>
+    </footer>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var CHECK_STORAGE_KEY = "s4.escalaNominal.checkin.v1";
+
+  var $ = function (sel, root) { return (root || document).querySelector(sel); };
+  var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
+
+  function escapeHtml(s) {
+    return (s || "").toString().replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  var VEICULOS = [
+    { id: 'onibus', label: 'Ônibus', grupo: 'Transporte de pessoal', pessoal: [
+      { nome: 'MAJ ASSIS', grupo: 'EM' },
+      { nome: 'CAP ALLAN COSTA', grupo: 'EM' },
+      { nome: '2º TEN NEGREIROS', grupo: 'EM' },
+      { nome: 'ST LERANDE', grupo: 'EM' },
+      { nome: 'CAP RIBEIRO', grupo: 'Bloco 1' },
+      { nome: 'TEN MARTINI', grupo: 'Bloco 1' },
+      { nome: 'TEN JOÃO OLIVEIRA', grupo: 'Bloco 1' },
+      { nome: 'TEN VENTILARI', grupo: 'Bloco 1' },
+      { nome: 'SGT ITALO', grupo: 'Bloco 1' },
+      { nome: 'SGT COIMBRA NETO', grupo: 'Bloco 1' },
+      { nome: 'SGT SANTANA', grupo: 'Bloco 1' },
+      { nome: 'SGT CASTRO', grupo: 'Bloco 1' },
+      { nome: 'SGT WENDEL', grupo: 'Bloco 1' },
+      { nome: 'TEN RAPHAEL SANTOS', grupo: 'Bloco 2' },
+      { nome: 'TEN BATISTA', grupo: 'Bloco 2' },
+      { nome: 'TEN HENRIQUE', grupo: 'Bloco 2' },
+      { nome: '3 SGT EGGERS', grupo: 'Bloco 2' },
+      { nome: '3 SGT NETO', grupo: 'Bloco 2' },
+      { nome: '3 SGT GILVAN', grupo: 'Bloco 2' },
+      { nome: '3 SGT JOAO PAULO', grupo: 'Bloco 2' },
+      { nome: '3 SGT BRANDÃO', grupo: 'Bloco 2' },
+      { nome: '3 SGT SILVEIRA', grupo: 'Bloco 2' },
+      { nome: '3 SGT PIETRO', grupo: 'Bloco 2' },
+      { nome: '1º TEN TEIXEIRA', grupo: 'Bloco 3' },
+      { nome: '2º TEN ARISTIDES', grupo: 'Bloco 3' },
+      { nome: '3ºSGT MAHAD', grupo: 'Bloco 3' },
+      { nome: '2º SGT ALEXANDRO', grupo: 'Bloco 3' },
+      { nome: '3ºSGT SAMUEL SOUZA', grupo: 'Bloco 3' },
+      { nome: '3ºSGT IAN SANTOS', grupo: 'Bloco 3' },
+      { nome: '3ºSGT ALFREDO', grupo: 'Bloco 3' },
+      { nome: '3ºSGT RODRIGO', grupo: 'Bloco 3' },
+      { nome: '3ºSGT ALEXSANDER', grupo: 'Bloco 3' },
+      { nome: 'ST MACEDO', grupo: 'ST/Apoio' },
+      { nome: 'SGT EVANDRO CESAR', grupo: 'ST/Apoio' },
+    ] },
+    { id: 'transp1', label: '5 Ton Transporte #1', grupo: 'Transporte de pessoal', pessoal: [
+      { nome: '3 SGT THALAN', grupo: 'ST/Apoio' },
+      { nome: '2º Ten Guimarães', grupo: 'RP' },
+      { nome: 'ST Melo', grupo: 'RP' },
+      { nome: 'Cap Brum', grupo: 'Bandeiras' },
+      { nome: 'CB SANTANA', grupo: 'EM' },
+      { nome: 'CB LOURETO', grupo: 'ST/Apoio' },
+      { nome: 'SD EP RAMALHO', grupo: 'ST/Apoio' },
+      { nome: 'SD EP FERREIRA LIMA', grupo: 'ST/Apoio' },
+      { nome: 'SD EP CUNHA', grupo: 'ST/Apoio' },
+      { nome: 'SD EP DAVID', grupo: 'ST/Apoio' },
+      { nome: 'SD EP ADRIAN', grupo: 'ST/Apoio' },
+      { nome: 'SD EP MORAES', grupo: 'ST/Apoio' },
+      { nome: 'SD EP JOABE', grupo: 'ST/Apoio' },
+      { nome: 'Sd Santos', grupo: 'RP' },
+      { nome: 'Al MENDES', grupo: 'Bandeiras' },
+      { nome: 'Al ISAC', grupo: 'Bandeiras' },
+      { nome: 'Al SANTANA', grupo: 'Bandeiras' },
+      { nome: 'Al DELRYK', grupo: 'Bandeiras' },
+      { nome: 'Al GRIZOTTI', grupo: 'Bandeiras' },
+      { nome: 'Al ROCHA', grupo: 'Bandeiras' },
+      { nome: 'Al MATIAS', grupo: 'Bandeiras' },
+      { nome: 'Al SERRA', grupo: 'Bandeiras' },
+      { nome: 'Al BONFIM', grupo: 'Bandeiras' },
+    ] },
+    { id: 'transp2', label: '5 Ton Transporte #2', grupo: 'Transporte de pessoal', pessoal: [
+      { nome: 'Al MARCOS', grupo: 'Bandeiras' },
+      { nome: 'Al SAMPAIO', grupo: 'Bandeiras' },
+      { nome: 'Al NOGUEIRA', grupo: 'Bandeiras' },
+      { nome: 'Al ALÉCIO (RESERVA)', grupo: 'Bandeiras' },
+      { nome: 'Al PEREIRA (RESERVA)', grupo: 'Bandeiras' },
+      { nome: 'SD EP BATISTA', grupo: 'Bloco 1' },
+      { nome: 'CB EP EDSON', grupo: 'Bloco 1' },
+      { nome: 'CB EP M SILVA', grupo: 'Bloco 1' },
+      { nome: 'CB EP SOARES', grupo: 'Bloco 1' },
+      { nome: 'SD EP REINALDO', grupo: 'Bloco 1' },
+      { nome: 'SD EP ABREU', grupo: 'Bloco 1' },
+      { nome: 'SD EP LOHAN', grupo: 'Bloco 1' },
+      { nome: 'SD EP MESQUITA', grupo: 'Bloco 1' },
+      { nome: 'SD EP LUIZ', grupo: 'Bloco 1' },
+      { nome: 'SD EP GIDEÃO', grupo: 'Bloco 1' },
+      { nome: 'SD EP TOME', grupo: 'Bloco 1' },
+      { nome: 'SD EP ISAIAS', grupo: 'Bloco 1' },
+      { nome: 'SD EP BONFIM', grupo: 'Bloco 1' },
+      { nome: 'SD EP LÚCIO', grupo: 'Bloco 1' },
+      { nome: 'SD EP FRANCISCO', grupo: 'Bloco 1' },
+      { nome: 'SD EP DE ARAÚJO', grupo: 'Bloco 1' },
+      { nome: 'SD EP BARROS', grupo: 'Bloco 1' },
+      { nome: 'SD EP SOUZA RODRIGUES', grupo: 'Bloco 1' },
+    ] },
+    { id: 'transp3', label: '5 Ton Transporte #3', grupo: 'Transporte de pessoal', pessoal: [
+      { nome: 'SD EP SALES', grupo: 'Bloco 1' },
+      { nome: 'SD EP VINICIOS', grupo: 'Bloco 1' },
+      { nome: 'SD EP JAISLAN', grupo: 'Bloco 1' },
+      { nome: 'SD EP COSTA', grupo: 'Bloco 1' },
+      { nome: 'SD EP ERIK', grupo: 'Bloco 1' },
+      { nome: 'SD EP VALENÇA', grupo: 'Bloco 1' },
+      { nome: 'SD EP ALBARADO', grupo: 'Bloco 1' },
+      { nome: 'SD EP NYCOLAS', grupo: 'Bloco 1' },
+      { nome: 'SD EP AMORIM', grupo: 'Bloco 1' },
+      { nome: 'Al ANDRADE', grupo: 'Bloco 1' },
+      { nome: 'Al ANDREY', grupo: 'Bloco 1' },
+      { nome: 'SD EV VELOSO', grupo: 'Bloco 1' },
+      { nome: 'SD EV SAMPAIO', grupo: 'Bloco 1' },
+      { nome: 'SD EV THIAGO', grupo: 'Bloco 1' },
+      { nome: 'SD EV KAULY', grupo: 'Bloco 1' },
+      { nome: 'SD EV CAUE', grupo: 'Bloco 1' },
+      { nome: 'SD EV F MORAES', grupo: 'Bloco 1' },
+      { nome: 'SD EV DA SILVA', grupo: 'Bloco 1' },
+      { nome: 'CB EP VITOR DIAS', grupo: 'Bloco 1' },
+      { nome: 'SD EP MOURA', grupo: 'Bloco 1' },
+      { nome: 'SD EV NATHAN', grupo: 'Bloco 1' },
+      { nome: 'SD EV ALBUQUERQUE', grupo: 'Bloco 1' },
+      { nome: 'SD EV LUCAS', grupo: 'Bloco 1' },
+    ] },
+    { id: 'desf1', label: '5 Ton Desfile Motorizado #1', grupo: 'Desfile motorizado (leva gente)', pessoal: [
+      { nome: 'SD EV DE PAULA', grupo: 'Bloco 1' },
+      { nome: 'SD EV PEREIRA SANTOS', grupo: 'Bloco 1' },
+      { nome: 'SD EV FELIPE', grupo: 'Bloco 1' },
+      { nome: 'SD EV DE SOUZA', grupo: 'Bloco 1' },
+      { nome: 'SD EV SILVA PEREIRA', grupo: 'Bloco 1' },
+      { nome: 'SD EV XAVIER', grupo: 'Bloco 1' },
+      { nome: 'SD EV ARAGÃO', grupo: 'Bloco 1' },
+      { nome: 'SD EV KELVEN', grupo: 'Bloco 1' },
+      { nome: 'SD EV JULIO CESAR', grupo: 'Bloco 1' },
+      { nome: 'CB NAILSON', grupo: 'Bloco 2' },
+      { nome: 'CB JANIO', grupo: 'Bloco 2' },
+      { nome: 'CB MENDES', grupo: 'Bloco 2' },
+      { nome: 'CB SILVA LIMA', grupo: 'Bloco 2' },
+      { nome: 'CB VICTOR', grupo: 'Bloco 2' },
+      { nome: 'CB RIAN SILVA', grupo: 'Bloco 2' },
+      { nome: 'CB JOELTON', grupo: 'Bloco 2' },
+      { nome: 'CB PITTER', grupo: 'Bloco 2' },
+      { nome: 'CB MARINHO', grupo: 'Bloco 2' },
+      { nome: 'CB BARBOSA', grupo: 'Bloco 2' },
+      { nome: 'CB SOARES', grupo: 'Bloco 2' },
+      { nome: 'SD G FERNANDES', grupo: 'Bloco 2' },
+      { nome: 'SD EP MACHADO', grupo: 'Bloco 2' },
+      { nome: 'SD EP ALEXANDRO', grupo: 'Bloco 2' },
+    ] },
+    { id: 'desf2', label: '5 Ton Desfile Motorizado #2', grupo: 'Desfile motorizado (leva gente)', pessoal: [
+      { nome: 'SD EP RICARDO', grupo: 'Bloco 2' },
+      { nome: 'SD EP RYAN', grupo: 'Bloco 2' },
+      { nome: 'SD EP CALEBE', grupo: 'Bloco 2' },
+      { nome: 'SD EP W SOARES', grupo: 'Bloco 2' },
+      { nome: 'SD PEREIRA', grupo: 'Bloco 2' },
+      { nome: 'SD EP BASTOS', grupo: 'Bloco 2' },
+      { nome: 'SD EP ISRAEL VIANA', grupo: 'Bloco 2' },
+      { nome: 'AS EP MULLER', grupo: 'Bloco 2' },
+      { nome: 'SD EP ANDRADE', grupo: 'Bloco 2' },
+      { nome: 'SD EP ALAN', grupo: 'Bloco 2' },
+      { nome: 'SD EV R SANTOS', grupo: 'Bloco 2' },
+      { nome: 'SD EV WILLIAN LIMA', grupo: 'Bloco 2' },
+      { nome: 'SD EV CARLOS', grupo: 'Bloco 2' },
+      { nome: 'SD EV RIOS', grupo: 'Bloco 2' },
+      { nome: 'SD EV FIGUEIREDO', grupo: 'Bloco 2' },
+      { nome: 'SD EV BORGES', grupo: 'Bloco 2' },
+      { nome: 'SD EP WILLIANS', grupo: 'Bloco 2' },
+      { nome: 'SD EP KEVY ALVES', grupo: 'Bloco 2' },
+      { nome: 'SD EP CALIXTO', grupo: 'Bloco 2' },
+      { nome: 'SD EP BRITO', grupo: 'Bloco 2' },
+      { nome: 'SD EP V ARAUJO', grupo: 'Bloco 2' },
+      { nome: 'SD EP AQUINO', grupo: 'Bloco 2' },
+      { nome: 'SD EP M AZEVEDO', grupo: 'Bloco 2' },
+    ] },
+    { id: 'desf3', label: '5 Ton Desfile Motorizado #3', grupo: 'Desfile motorizado (leva gente)', pessoal: [
+      { nome: 'SD EP DANTAS', grupo: 'Bloco 2' },
+      { nome: 'SD EP HENRIQUE LIMA', grupo: 'Bloco 2' },
+      { nome: 'SD EP O DURANS', grupo: 'Bloco 2' },
+      { nome: 'SD EP K SILVA', grupo: 'Bloco 2' },
+      { nome: 'SD EP FLORENTINO', grupo: 'Bloco 2' },
+      { nome: 'SD EP PALHETA', grupo: 'Bloco 2' },
+      { nome: 'SD EP DIEMESON', grupo: 'Bloco 2' },
+      { nome: 'SD EP THOMAS', grupo: 'Bloco 2' },
+      { nome: 'SD EP JONAS SILVA', grupo: 'Bloco 2' },
+      { nome: 'SD EP TRINDADE', grupo: 'Bloco 2' },
+      { nome: 'SD EP COUTO', grupo: 'Bloco 2' },
+      { nome: 'SD EP LIMA PAIVA', grupo: 'Bloco 2' },
+      { nome: 'SD EP PHELIPE', grupo: 'Bloco 3' },
+      { nome: 'SD EV FELIPE SILVA', grupo: 'Bloco 3' },
+      { nome: 'SD EP KAELL', grupo: 'Bloco 3' },
+      { nome: 'SD EV SANTYAGO', grupo: 'Bloco 3' },
+      { nome: 'CB ELIAS ARAUJO', grupo: 'Bloco 3' },
+      { nome: 'SD EP L.FERREIRA', grupo: 'Bloco 3' },
+      { nome: 'CB MATEUS', grupo: 'Bloco 3' },
+      { nome: 'SD EP IDELVAN', grupo: 'Bloco 3' },
+      { nome: 'CB ÍCARO', grupo: 'Bloco 3' },
+      { nome: 'SD EV DAVID CRUZ', grupo: 'Bloco 3' },
+      { nome: 'SD EP DOS SANTOS', grupo: 'Bloco 3' },
+    ] },
+    { id: 'desf4', label: '5 Ton Desfile Motorizado #4', grupo: 'Desfile motorizado (leva gente)', pessoal: [
+      { nome: 'SD EP MARCOS BORGES', grupo: 'Bloco 3' },
+      { nome: 'SD EV CRUZ', grupo: 'Bloco 3' },
+      { nome: 'SD MENDONÇA', grupo: 'Bloco 3' },
+      { nome: 'SD EV ASSUNÇÃO', grupo: 'Bloco 3' },
+      { nome: 'SD EV TEODORO', grupo: 'Bloco 3' },
+      { nome: 'SD EP ALVES', grupo: 'Bloco 3' },
+      { nome: 'SD EP MARTINS SILVA', grupo: 'Bloco 3' },
+      { nome: 'SD EP GOMES', grupo: 'Bloco 3' },
+      { nome: 'SD EP SILVA', grupo: 'Bloco 3' },
+      { nome: 'SD EP PICANÇO', grupo: 'Bloco 3' },
+      { nome: 'SD EP DARLEN', grupo: 'Bloco 3' },
+      { nome: 'SD EP RAMOS', grupo: 'Bloco 3' },
+      { nome: 'SD EP NETO', grupo: 'Bloco 3' },
+      { nome: 'SD EP R.HARTUR', grupo: 'Bloco 3' },
+      { nome: 'SD EP FELIX', grupo: 'Bloco 3' },
+      { nome: 'SD EV HENRIQUE', grupo: 'Bloco 3' },
+      { nome: 'SD EV DIAS', grupo: 'Bloco 3' },
+      { nome: 'SD EV DO VALE', grupo: 'Bloco 3' },
+      { nome: 'SD EV NÓBREGA', grupo: 'Bloco 3' },
+      { nome: 'SD EV EDEN SILVA', grupo: 'Bloco 3' },
+      { nome: 'SD EV GABRIEL SILVA', grupo: 'Bloco 3' },
+      { nome: 'SD EV CONCEIÇÃO', grupo: 'Bloco 3' },
+      { nome: 'SD EV DANTAS', grupo: 'Bloco 3' },
+    ] },
+    { id: 'desf5', label: '5 Ton Desfile Motorizado #5', grupo: 'Desfile motorizado (leva gente)', pessoal: [
+      { nome: 'SD EV LORENZO', grupo: 'Bloco 3' },
+      { nome: 'SD EV ALVES CASTRO', grupo: 'Bloco 3' },
+      { nome: 'SD EV SIMPLICIO', grupo: 'Bloco 3' },
+      { nome: 'SD EV MOREIRA', grupo: 'Bloco 3' },
+      { nome: 'SD THIAGO COSTA', grupo: 'Bloco 3' },
+      { nome: 'SD ROGER', grupo: 'Bloco 3' },
+      { nome: 'SD RICHIL', grupo: 'Bloco 3' },
+      { nome: 'SD EV PABLO', grupo: 'Bloco 3' },
+      { nome: 'SD EV GONÇALVES', grupo: 'Bloco 3' },
+      { nome: 'SD EV CIQUEIRA', grupo: 'Bloco 3' },
+      { nome: 'SD EV ERIC', grupo: 'Bloco 3' },
+      { nome: 'SD EV VELOSO', grupo: 'Bloco 3' },
+      { nome: 'SD EV KAWAN BARBOSA', grupo: 'Bloco 3' },
+      { nome: 'SDD EV KAIKE', grupo: 'Bloco 3' },
+      { nome: 'SD EV BARCELOS', grupo: 'Bloco 3' },
+    ] },
+    { id: 'desf6', label: '5 Ton Desfile Motorizado #6', grupo: 'Desfile motorizado (só guarnição)', pessoal: [] },
+    { id: 'desf7', label: '5 Ton Desfile Motorizado #7', grupo: 'Desfile motorizado (só guarnição)', pessoal: [] },
+    { id: 'desf8', label: '5 Ton Desfile Motorizado #8', grupo: 'Desfile motorizado (só guarnição)', pessoal: [] },
+  ];
+
+  function loadCheckin() {
+    try {
+      var raw = localStorage.getItem(CHECK_STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return {};
+  }
+  function persistCheckin() {
+    try { localStorage.setItem(CHECK_STORAGE_KEY, JSON.stringify(checkin)); } catch (e) {}
+  }
+  var checkin = loadCheckin();
+  function keyFor(veicId, idx) { return veicId + "::" + idx; }
+
+  function renderVeiculos() {
+    var grid = $("#veic-grid");
+    grid.innerHTML = "";
+    var totalPessoal = 0, totalConfirmados = 0, viaturasComPessoal = 0, semPax = 0;
+
+    VEICULOS.forEach(function (v) {
+      totalPessoal += v.pessoal.length;
+      if (v.pessoal.length) viaturasComPessoal++; else semPax++;
+
+      var card = document.createElement("div");
+      card.className = "veic";
+      var tagClass = v.pessoal.length ? "" : " sem";
+      var head = '<div class="veic-head"><span class="count">' + v.pessoal.length + '</span>' +
+        '<h3>' + escapeHtml(v.label) + '</h3><div class="tag' + tagClass + '">' + escapeHtml(v.grupo) + '</div></div>';
+
+      var listHtml;
+      if (!v.pessoal.length) {
+        listHtml = '<div class="veic-empty">Sem passageiro extra — só chefe de vtr, motorista e 2 militares armados (preencher no Comboios).</div>';
+      } else {
+        listHtml = '<ul class="veic-list">' + v.pessoal.map(function (p, idx) {
+          var k = keyFor(v.id, idx);
+          var checked = !!checkin[k];
+          if (checked) totalConfirmados++;
+          return '<li class="' + (checked ? "checked" : "") + '" data-key="' + k + '">' +
+            '<input type="checkbox" ' + (checked ? "checked" : "") + '>' +
+            '<span class="nr tabular">' + (idx + 1) + '</span>' +
+            '<span class="nome">' + escapeHtml(p.nome) + '</span>' +
+            '<span class="grupo-tag">' + escapeHtml(p.grupo) + '</span></li>';
+        }).join("") + '</ul>';
+      }
+      card.innerHTML = head + listHtml;
+      grid.appendChild(card);
+    });
+
+    $("#kpi-total").textContent = totalPessoal;
+    $("#kpi-confirmados").textContent = totalConfirmados;
+    $("#kpi-confirmados-note").textContent = totalPessoal ? Math.round((totalConfirmados / totalPessoal) * 100) + "% da lista" : "";
+    $("#kpi-viaturas").textContent = viaturasComPessoal;
+    $("#kpi-sem-pax").textContent = semPax;
+  }
+
+  document.addEventListener("change", function (e) {
+    var cb = e.target.closest('.veic-list input[type=checkbox]');
+    if (!cb) return;
+    var li = cb.closest("li");
+    var key = li.getAttribute("data-key");
+    checkin[key] = cb.checked;
+    li.classList.toggle("checked", cb.checked);
+    persistCheckin();
+    var totalConfirmados = $$('.veic-list input[type=checkbox]:checked').length;
+    var totalPessoal = $$('.veic-list input[type=checkbox]').length;
+    $("#kpi-confirmados").textContent = totalConfirmados;
+    $("#kpi-confirmados-note").textContent = totalPessoal ? Math.round((totalConfirmados / totalPessoal) * 100) + "% da lista" : "";
+  });
+
+  $("#btn-print").addEventListener("click", function () { window.print(); });
+  $("#btn-reset").addEventListener("click", function () {
+    if (!window.confirm("Limpar todas as marcações de presença/embarque?")) return;
+    checkin = {};
+    persistCheckin();
+    renderVeiculos();
+  });
+
+  renderVeiculos();
+})();
+</script>
+</body>
+</html>
