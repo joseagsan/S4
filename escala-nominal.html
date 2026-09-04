@@ -113,6 +113,13 @@
   .veic-head .tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-top: 2px; }
   .veic-head .tag.sem { color: var(--muted); }
   .veic-head .count { float: right; font-size: 12px; color: var(--muted); font-weight: 700; }
+  .veic-head .ch-vtr-field { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+  .veic-head .ch-vtr-field label { font-size: 10.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; flex: none; }
+  .veic-head .ch-vtr-field input {
+    font: inherit; font-size: 12.5px; background: var(--surface); color: var(--ink); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 8px; flex: 1; min-width: 0;
+  }
+  .veic-head .ch-vtr-field input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   .veic-list { list-style: none; margin: 0; padding: 6px 0; max-height: none; }
   .veic-list li {
     display: flex; align-items: center; gap: 8px; padding: 5px 14px; font-size: 12.5px; border-bottom: 1px solid var(--grid);
@@ -140,6 +147,7 @@
     body, .app { background: #fff; }
     .veic, .kpi { box-shadow: none; border: 1px solid #999; }
     .veic-grid { grid-template-columns: repeat(2, 1fr); }
+    .veic-head .ch-vtr-field input { border: none; border-bottom: 1px solid #999; border-radius: 0; padding: 2px 0; background: transparent; }
   }
 </style>
 </head>
@@ -432,6 +440,7 @@
 
   var CHECK_STORAGE_KEY = "s4.escalaNominal.checkin.v1";
   var POS_STORAGE_KEY = "s4.escalaNominal.posicoes.v1";
+  var CHVTR_STORAGE_KEY = "s4.escalaNominal.chefeVtr.v1";
 
   var VEIC_BY_ID = {};
   VEICULOS.forEach(function (v) { VEIC_BY_ID[v.id] = v; });
@@ -449,6 +458,7 @@
 
   var checkin = loadJson(CHECK_STORAGE_KEY);   // { personId: true }
   var posicoes = loadJson(POS_STORAGE_KEY);    // { personId: veiculoId } (só quando movido manualmente)
+  var chefesVtr = loadJson(CHVTR_STORAGE_KEY); // { veiculoId: "Nome do Chefe de Vtr" }
 
   function vtrAtualDe(p) { return posicoes[p.id] || p.vtrPadrao; }
 
@@ -471,7 +481,10 @@
       card.className = "veic";
       var tagClass = ocupantes.length ? "" : " sem";
       var head = '<div class="veic-head"><span class="count">' + ocupantes.length + '</span>' +
-        '<h3>' + escapeHtml(v.label) + '</h3><div class="tag' + tagClass + '">' + escapeHtml(v.categoria) + '</div></div>';
+        '<h3>' + escapeHtml(v.label) + '</h3><div class="tag' + tagClass + '">' + escapeHtml(v.categoria) + '</div>' +
+        '<div class="ch-vtr-field"><label for="chvtr-' + v.id + '">Ch Vtr</label>' +
+        '<input type="text" id="chvtr-' + v.id + '" data-veic="' + v.id + '" value="' +
+        escapeHtml(chefesVtr[v.id] || "") + '" placeholder="Nome do Chefe de Vtr"></div></div>';
 
       var listHtml;
       if (!ocupantes.length) {
@@ -524,6 +537,14 @@
       renderVeiculos();
       return;
     }
+  });
+
+  document.addEventListener("input", function (e) {
+    var chInp = e.target.closest(".ch-vtr-field input");
+    if (!chInp) return;
+    var veicId = chInp.getAttribute("data-veic");
+    chefesVtr[veicId] = chInp.value;
+    persist(CHVTR_STORAGE_KEY, chefesVtr);
   });
 
   $("#btn-print").addEventListener("click", function () { window.print(); });
