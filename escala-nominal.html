@@ -159,7 +159,7 @@
       <div>
         <p class="eyebrow">Função S4 · Logística</p>
         <h1>Escala Nominal — Comboios do Desfile</h1>
-        <p class="sub">EM, Bloco 1, Bloco 2, Bloco 3, RP e Bandeiras Históricas, divididos por viatura. Use o seletor ao lado de cada nome para mudar a viatura de alguém.</p>
+        <p class="sub">EM, Bloco 1, Bloco 2, Bloco 3, RP e Bandeiras Históricas, divididos por viatura. Ordem de deslocamento: Desfile Motorizado sai na frente, Transporte de Pessoal atrás. Use o seletor ao lado de cada nome para mudar a viatura de alguém.</p>
       </div>
       <div class="actions no-print">
         <a href="comboios.html"><button class="ghost" type="button">← Comboios</button></a>
@@ -221,10 +221,6 @@
   }
 
   var VEICULOS = [
-    { id: 'onibus', label: 'Ônibus', categoria: 'Transporte de pessoal' },
-    { id: 'transp1', label: '5 Ton Transporte #1', categoria: 'Transporte de pessoal' },
-    { id: 'transp2', label: '5 Ton Transporte #2', categoria: 'Transporte de pessoal' },
-    { id: 'transp3', label: '5 Ton Transporte #3', categoria: 'Transporte de pessoal' },
     { id: 'desf1', label: '5 Ton Desfile Motorizado #1', categoria: 'Desfile motorizado' },
     { id: 'desf2', label: '5 Ton Desfile Motorizado #2', categoria: 'Desfile motorizado' },
     { id: 'desf3', label: '5 Ton Desfile Motorizado #3', categoria: 'Desfile motorizado' },
@@ -233,6 +229,10 @@
     { id: 'desf6', label: '5 Ton Desfile Motorizado #6', categoria: 'Desfile motorizado' },
     { id: 'desf7', label: '5 Ton Desfile Motorizado #7', categoria: 'Desfile motorizado' },
     { id: 'desf8', label: '5 Ton Desfile Motorizado #8', categoria: 'Desfile motorizado' },
+    { id: 'onibus', label: 'Ônibus', categoria: 'Transporte de pessoal' },
+    { id: 'transp1', label: '5 Ton Transporte #1', categoria: 'Transporte de pessoal' },
+    { id: 'transp2', label: '5 Ton Transporte #2', categoria: 'Transporte de pessoal' },
+    { id: 'transp3', label: '5 Ton Transporte #3', categoria: 'Transporte de pessoal' },
   ];
 
   var PESSOAS = [

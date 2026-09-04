@@ -198,7 +198,7 @@
       <div>
         <p class="eyebrow">Função S4 · Logística</p>
         <h1>Planejamento de Comboios — Desfile</h1>
-        <p class="sub">Ordem de deslocamento da coluna: Comboio 2 — transporte de pessoal (5 Ton + ônibus) à frente, seguido do Comboio 1 — desfile motorizado (chefe de vtr + motorista + 2 militares armados por viatura).</p>
+        <p class="sub">Ordem de deslocamento da coluna: Comboio 1 — desfile motorizado (chefe de vtr + motorista + 2 militares armados por viatura) à frente, seguido do Comboio 2 — transporte de pessoal (5 Ton + ônibus).</p>
       </div>
       <div class="actions no-print">
         <a href="index.html"><button class="ghost" type="button">← Controle de viaturas</button></a>
@@ -211,16 +211,6 @@
     <div class="banner" id="source-banner" hidden></div>
 
     <div class="kpis">
-      <div class="kpi" style="--kpi-c: var(--good)">
-        <div class="label">Vtrs — Transporte de pessoal</div>
-        <div class="value tabular" id="kpi-transporte">0</div>
-        <div class="note" id="kpi-transporte-note">&nbsp;</div>
-      </div>
-      <div class="kpi" style="--kpi-c: var(--good)">
-        <div class="label">Efetivo p/ comboio (tripulação)</div>
-        <div class="value tabular" id="kpi-transporte-efetivo">0</div>
-        <div class="note">chefe + motorista, por vtr</div>
-      </div>
       <div class="kpi" style="--kpi-c: var(--accent)">
         <div class="label">Vtrs — Desfile motorizado</div>
         <div class="value tabular" id="kpi-desfile">0</div>
@@ -231,31 +221,21 @@
         <div class="value tabular" id="kpi-desfile-efetivo">0</div>
         <div class="note">chefe + motorista + 2 armados, por vtr</div>
       </div>
-    </div>
-
-    <div class="panel">
-      <h2>Comboio 2 — Transporte de pessoal <span class="badge transporte">1º na coluna</span></h2>
-      <p class="panel-sub">Viaturas destinadas a levar o efetivo até o local do desfile. Seguem à frente na coluna de deslocamento.</p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th class="ord">Ord</th>
-              <th>Viatura</th>
-              <th>Chefe de Vtr</th>
-              <th>Motorista</th>
-              <th class="qtd-col">Qtd militares</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-transporte"></tbody>
-        </table>
-        <div class="empty-mini" id="empty-transporte" hidden>Nenhuma viatura atribuída a este comboio. Ajuste o comboio de cada viatura na tabela "Frota disponível" abaixo.</div>
+      <div class="kpi" style="--kpi-c: var(--good)">
+        <div class="label">Vtrs — Transporte de pessoal</div>
+        <div class="value tabular" id="kpi-transporte">0</div>
+        <div class="note" id="kpi-transporte-note">&nbsp;</div>
+      </div>
+      <div class="kpi" style="--kpi-c: var(--good)">
+        <div class="label">Efetivo p/ comboio (tripulação)</div>
+        <div class="value tabular" id="kpi-transporte-efetivo">0</div>
+        <div class="note">chefe + motorista, por vtr</div>
       </div>
     </div>
 
     <div class="panel">
-      <h2>Comboio 1 — Desfile motorizado <span class="badge desfile">2º na coluna</span></h2>
-      <p class="panel-sub">Preencha o nome do Chefe de Vtr, do motorista e dos 2 militares armados de cada viatura. Desloca-se atrás do Comboio 2.</p>
+      <h2>Comboio 1 — Desfile motorizado <span class="badge desfile">1º na coluna</span></h2>
+      <p class="panel-sub">Preencha o nome do Chefe de Vtr, do motorista e dos 2 militares armados de cada viatura. Segue à frente na coluna de deslocamento.</p>
       <div class="table-wrap">
         <table>
           <thead>
@@ -272,6 +252,26 @@
           <tbody id="tbody-desfile"></tbody>
         </table>
         <div class="empty-mini" id="empty-desfile" hidden>Nenhuma viatura atribuída a este comboio. Ajuste o comboio de cada viatura na tabela "Frota disponível" abaixo.</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Comboio 2 — Transporte de pessoal <span class="badge transporte">2º na coluna</span></h2>
+      <p class="panel-sub">Viaturas destinadas a levar o efetivo até o local do desfile. Desloca-se atrás do Comboio 1.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="ord">Ord</th>
+              <th>Viatura</th>
+              <th>Chefe de Vtr</th>
+              <th>Motorista</th>
+              <th class="qtd-col">Qtd militares</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-transporte"></tbody>
+        </table>
+        <div class="empty-mini" id="empty-transporte" hidden>Nenhuma viatura atribuída a este comboio. Ajuste o comboio de cada viatura na tabela "Frota disponível" abaixo.</div>
       </div>
     </div>
 
