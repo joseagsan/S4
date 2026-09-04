@@ -121,6 +121,8 @@
   .veic-list .nr { color: var(--muted); width: 20px; flex: none; text-align: right; font-size: 11px; }
   .veic-list .nome { flex: 1; }
   .veic-list .grupo-tag { font-size: 10px; color: var(--muted); background: var(--surface-2); border-radius: 4px; padding: 1px 6px; flex: none; }
+  .veic-list .grupo-tag.cmt { color: var(--accent); background: var(--accent-wash); font-weight: 700; }
+  .veic-list li:has(.grupo-tag.cmt) { background: var(--accent-wash); }
   .veic-list li.checked .nome { text-decoration: line-through; color: var(--muted); }
   .veic-empty { padding: 14px; font-size: 12.5px; color: var(--muted); font-style: italic; }
   input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--accent); flex: none; }
@@ -144,7 +146,7 @@
       <div>
         <p class="eyebrow">Função S4 · Logística</p>
         <h1>Escala Nominal — Comboios do Desfile</h1>
-        <p class="sub">EM, Bloco 1, Bloco 2, Bloco 3, RP e Bandeiras Históricas, divididos por viatura. Oficiais e sargentos priorizados no ônibus.</p>
+        <p class="sub">EM, Bloco 1, Bloco 2, Bloco 3, RP e Bandeiras Históricas, divididos por viatura. Oficiais no ônibus; cada viatura que leva praças de um bloco tem 1 sargento daquele bloco embarcado para comandar (destacado em azul).</p>
       </div>
       <div class="actions no-print">
         <a href="comboios.html"><button class="ghost" type="button">← Comboios</button></a>
@@ -214,59 +216,33 @@
       { nome: 'TEN MARTINI', grupo: 'Bloco 1' },
       { nome: 'TEN JOÃO OLIVEIRA', grupo: 'Bloco 1' },
       { nome: 'TEN VENTILARI', grupo: 'Bloco 1' },
-      { nome: 'SGT ITALO', grupo: 'Bloco 1' },
-      { nome: 'SGT COIMBRA NETO', grupo: 'Bloco 1' },
-      { nome: 'SGT SANTANA', grupo: 'Bloco 1' },
       { nome: 'SGT CASTRO', grupo: 'Bloco 1' },
       { nome: 'SGT WENDEL', grupo: 'Bloco 1' },
       { nome: 'TEN RAPHAEL SANTOS', grupo: 'Bloco 2' },
       { nome: 'TEN BATISTA', grupo: 'Bloco 2' },
       { nome: 'TEN HENRIQUE', grupo: 'Bloco 2' },
-      { nome: '3 SGT EGGERS', grupo: 'Bloco 2' },
-      { nome: '3 SGT NETO', grupo: 'Bloco 2' },
-      { nome: '3 SGT GILVAN', grupo: 'Bloco 2' },
       { nome: '3 SGT JOAO PAULO', grupo: 'Bloco 2' },
       { nome: '3 SGT BRANDÃO', grupo: 'Bloco 2' },
       { nome: '3 SGT SILVEIRA', grupo: 'Bloco 2' },
       { nome: '3 SGT PIETRO', grupo: 'Bloco 2' },
       { nome: '1º TEN TEIXEIRA', grupo: 'Bloco 3' },
       { nome: '2º TEN ARISTIDES', grupo: 'Bloco 3' },
-      { nome: '3ºSGT MAHAD', grupo: 'Bloco 3' },
-      { nome: '2º SGT ALEXANDRO', grupo: 'Bloco 3' },
-      { nome: '3ºSGT SAMUEL SOUZA', grupo: 'Bloco 3' },
       { nome: '3ºSGT IAN SANTOS', grupo: 'Bloco 3' },
       { nome: '3ºSGT ALFREDO', grupo: 'Bloco 3' },
       { nome: '3ºSGT RODRIGO', grupo: 'Bloco 3' },
       { nome: '3ºSGT ALEXSANDER', grupo: 'Bloco 3' },
       { nome: '2º Ten Guimarães', grupo: 'RP' },
       { nome: 'ST Melo', grupo: 'RP' },
+      { nome: 'Cap Brum', grupo: 'Bandeiras' },
     ] },
     { id: 'transp1', label: '5 Ton Transporte #1', grupo: 'Transporte de pessoal', pessoal: [
-      { nome: 'Cap Brum', grupo: 'Bandeiras' },
-      { nome: 'CB SANTANA', grupo: 'EM' },
-      { nome: 'Sd Santos', grupo: 'RP' },
-      { nome: 'Al MENDES', grupo: 'Bandeiras' },
-      { nome: 'Al ISAC', grupo: 'Bandeiras' },
-      { nome: 'Al SANTANA', grupo: 'Bandeiras' },
-      { nome: 'Al DELRYK', grupo: 'Bandeiras' },
-      { nome: 'Al GRIZOTTI', grupo: 'Bandeiras' },
-      { nome: 'Al ROCHA', grupo: 'Bandeiras' },
-      { nome: 'Al MATIAS', grupo: 'Bandeiras' },
-      { nome: 'Al SERRA', grupo: 'Bandeiras' },
-      { nome: 'Al BONFIM', grupo: 'Bandeiras' },
-      { nome: 'Al MARCOS', grupo: 'Bandeiras' },
-      { nome: 'Al SAMPAIO', grupo: 'Bandeiras' },
-      { nome: 'Al NOGUEIRA', grupo: 'Bandeiras' },
-      { nome: 'Al ALÉCIO (RESERVA)', grupo: 'Bandeiras' },
-      { nome: 'Al PEREIRA (RESERVA)', grupo: 'Bandeiras' },
+      { nome: 'SGT ITALO', grupo: 'Bloco 1 · Sgt Cmt' },
       { nome: 'SD EP BATISTA', grupo: 'Bloco 1' },
       { nome: 'CB EP EDSON', grupo: 'Bloco 1' },
       { nome: 'CB EP M SILVA', grupo: 'Bloco 1' },
       { nome: 'CB EP SOARES', grupo: 'Bloco 1' },
       { nome: 'SD EP REINALDO', grupo: 'Bloco 1' },
       { nome: 'SD EP ABREU', grupo: 'Bloco 1' },
-    ] },
-    { id: 'transp2', label: '5 Ton Transporte #2', grupo: 'Transporte de pessoal', pessoal: [
       { nome: 'SD EP LOHAN', grupo: 'Bloco 1' },
       { nome: 'SD EP MESQUITA', grupo: 'Bloco 1' },
       { nome: 'SD EP LUIZ', grupo: 'Bloco 1' },
@@ -283,6 +259,9 @@
       { nome: 'SD EP VINICIOS', grupo: 'Bloco 1' },
       { nome: 'SD EP JAISLAN', grupo: 'Bloco 1' },
       { nome: 'SD EP COSTA', grupo: 'Bloco 1' },
+    ] },
+    { id: 'transp2', label: '5 Ton Transporte #2', grupo: 'Transporte de pessoal', pessoal: [
+      { nome: 'SGT COIMBRA NETO', grupo: 'Bloco 1 · Sgt Cmt' },
       { nome: 'SD EP ERIK', grupo: 'Bloco 1' },
       { nome: 'SD EP VALENÇA', grupo: 'Bloco 1' },
       { nome: 'SD EP ALBARADO', grupo: 'Bloco 1' },
@@ -290,8 +269,6 @@
       { nome: 'SD EP AMORIM', grupo: 'Bloco 1' },
       { nome: 'Al ANDRADE', grupo: 'Bloco 1' },
       { nome: 'Al ANDREY', grupo: 'Bloco 1' },
-    ] },
-    { id: 'transp3', label: '5 Ton Transporte #3', grupo: 'Transporte de pessoal', pessoal: [
       { nome: 'SD EV VELOSO', grupo: 'Bloco 1' },
       { nome: 'SD EV SAMPAIO', grupo: 'Bloco 1' },
       { nome: 'SD EV THIAGO', grupo: 'Bloco 1' },
@@ -307,16 +284,36 @@
       { nome: 'SD EV DE PAULA', grupo: 'Bloco 1' },
       { nome: 'SD EV PEREIRA SANTOS', grupo: 'Bloco 1' },
       { nome: 'SD EV FELIPE', grupo: 'Bloco 1' },
+    ] },
+    { id: 'transp3', label: '5 Ton Transporte #3', grupo: 'Transporte de pessoal', pessoal: [
+      { nome: 'SGT SANTANA', grupo: 'Bloco 1 · Sgt Cmt' },
       { nome: 'SD EV DE SOUZA', grupo: 'Bloco 1' },
       { nome: 'SD EV SILVA PEREIRA', grupo: 'Bloco 1' },
       { nome: 'SD EV XAVIER', grupo: 'Bloco 1' },
       { nome: 'SD EV ARAGÃO', grupo: 'Bloco 1' },
       { nome: 'SD EV KELVEN', grupo: 'Bloco 1' },
       { nome: 'SD EV JULIO CESAR', grupo: 'Bloco 1' },
-      { nome: 'CB NAILSON', grupo: 'Bloco 2' },
-      { nome: 'CB JANIO', grupo: 'Bloco 2' },
+      { nome: 'CB SANTANA', grupo: 'EM' },
+      { nome: 'Sd Santos', grupo: 'RP' },
+      { nome: 'Al MENDES', grupo: 'Bandeiras' },
+      { nome: 'Al ISAC', grupo: 'Bandeiras' },
+      { nome: 'Al SANTANA', grupo: 'Bandeiras' },
+      { nome: 'Al DELRYK', grupo: 'Bandeiras' },
+      { nome: 'Al GRIZOTTI', grupo: 'Bandeiras' },
+      { nome: 'Al ROCHA', grupo: 'Bandeiras' },
+      { nome: 'Al MATIAS', grupo: 'Bandeiras' },
+      { nome: 'Al SERRA', grupo: 'Bandeiras' },
+      { nome: 'Al BONFIM', grupo: 'Bandeiras' },
+      { nome: 'Al MARCOS', grupo: 'Bandeiras' },
+      { nome: 'Al SAMPAIO', grupo: 'Bandeiras' },
+      { nome: 'Al NOGUEIRA', grupo: 'Bandeiras' },
+      { nome: 'Al ALÉCIO (RESERVA)', grupo: 'Bandeiras' },
+      { nome: 'Al PEREIRA (RESERVA)', grupo: 'Bandeiras' },
     ] },
     { id: 'desf1', label: '5 Ton Desfile Motorizado #1', grupo: 'Desfile motorizado (leva gente)', pessoal: [
+      { nome: '3 SGT EGGERS', grupo: 'Bloco 2 · Sgt Cmt' },
+      { nome: 'CB NAILSON', grupo: 'Bloco 2' },
+      { nome: 'CB JANIO', grupo: 'Bloco 2' },
       { nome: 'CB MENDES', grupo: 'Bloco 2' },
       { nome: 'CB SILVA LIMA', grupo: 'Bloco 2' },
       { nome: 'CB VICTOR', grupo: 'Bloco 2' },
@@ -337,11 +334,12 @@
       { nome: 'SD EP BASTOS', grupo: 'Bloco 2' },
       { nome: 'SD EP ISRAEL VIANA', grupo: 'Bloco 2' },
       { nome: 'AS EP MULLER', grupo: 'Bloco 2' },
+    ] },
+    { id: 'desf2', label: '5 Ton Desfile Motorizado #2', grupo: 'Desfile motorizado (leva gente)', pessoal: [
+      { nome: '3 SGT NETO', grupo: 'Bloco 2 · Sgt Cmt' },
       { nome: 'SD EP ANDRADE', grupo: 'Bloco 2' },
       { nome: 'SD EP ALAN', grupo: 'Bloco 2' },
       { nome: 'SD EV R SANTOS', grupo: 'Bloco 2' },
-    ] },
-    { id: 'desf2', label: '5 Ton Desfile Motorizado #2', grupo: 'Desfile motorizado (leva gente)', pessoal: [
       { nome: 'SD EV WILLIAN LIMA', grupo: 'Bloco 2' },
       { nome: 'SD EV CARLOS', grupo: 'Bloco 2' },
       { nome: 'SD EV RIOS', grupo: 'Bloco 2' },
@@ -361,13 +359,17 @@
       { nome: 'SD EP FLORENTINO', grupo: 'Bloco 2' },
       { nome: 'SD EP PALHETA', grupo: 'Bloco 2' },
       { nome: 'SD EP DIEMESON', grupo: 'Bloco 2' },
+    ] },
+    { id: 'desf3', label: '5 Ton Desfile Motorizado #3', grupo: 'Desfile motorizado (leva gente)', pessoal: [
+      { nome: '3 SGT GILVAN', grupo: 'Bloco 2 · Sgt Cmt' },
       { nome: 'SD EP THOMAS', grupo: 'Bloco 2' },
       { nome: 'SD EP JONAS SILVA', grupo: 'Bloco 2' },
       { nome: 'SD EP TRINDADE', grupo: 'Bloco 2' },
       { nome: 'SD EP COUTO', grupo: 'Bloco 2' },
-    ] },
-    { id: 'desf3', label: '5 Ton Desfile Motorizado #3', grupo: 'Desfile motorizado (leva gente)', pessoal: [
       { nome: 'SD EP LIMA PAIVA', grupo: 'Bloco 2' },
+    ] },
+    { id: 'desf4', label: '5 Ton Desfile Motorizado #4', grupo: 'Desfile motorizado (leva gente)', pessoal: [
+      { nome: '3ºSGT MAHAD', grupo: 'Bloco 3 · Sgt Cmt' },
       { nome: 'SD EP PHELIPE', grupo: 'Bloco 3' },
       { nome: 'SD EV FELIPE SILVA', grupo: 'Bloco 3' },
       { nome: 'SD EP KAELL', grupo: 'Bloco 3' },
@@ -391,7 +393,8 @@
       { nome: 'SD EP PICANÇO', grupo: 'Bloco 3' },
       { nome: 'SD EP DARLEN', grupo: 'Bloco 3' },
     ] },
-    { id: 'desf4', label: '5 Ton Desfile Motorizado #4', grupo: 'Desfile motorizado (leva gente)', pessoal: [
+    { id: 'desf5', label: '5 Ton Desfile Motorizado #5', grupo: 'Desfile motorizado (leva gente)', pessoal: [
+      { nome: '2º SGT ALEXANDRO', grupo: 'Bloco 3 · Sgt Cmt' },
       { nome: 'SD EP RAMOS', grupo: 'Bloco 3' },
       { nome: 'SD EP NETO', grupo: 'Bloco 3' },
       { nome: 'SD EP R.HARTUR', grupo: 'Bloco 3' },
@@ -414,15 +417,15 @@
       { nome: 'SD EV PABLO', grupo: 'Bloco 3' },
       { nome: 'SD EV GONÇALVES', grupo: 'Bloco 3' },
       { nome: 'SD EV CIQUEIRA', grupo: 'Bloco 3' },
-      { nome: 'SD EV ERIC', grupo: 'Bloco 3' },
     ] },
-    { id: 'desf5', label: '5 Ton Desfile Motorizado #5', grupo: 'Desfile motorizado (leva gente)', pessoal: [
+    { id: 'desf6', label: '5 Ton Desfile Motorizado #6', grupo: 'Desfile motorizado (leva gente)', pessoal: [
+      { nome: '3ºSGT SAMUEL SOUZA', grupo: 'Bloco 3 · Sgt Cmt' },
+      { nome: 'SD EV ERIC', grupo: 'Bloco 3' },
       { nome: 'SD EV VELOSO', grupo: 'Bloco 3' },
       { nome: 'SD EV KAWAN BARBOSA', grupo: 'Bloco 3' },
       { nome: 'SDD EV KAIKE', grupo: 'Bloco 3' },
       { nome: 'SD EV BARCELOS', grupo: 'Bloco 3' },
     ] },
-    { id: 'desf6', label: '5 Ton Desfile Motorizado #6', grupo: 'Desfile motorizado (só guarnição)', pessoal: [] },
     { id: 'desf7', label: '5 Ton Desfile Motorizado #7', grupo: 'Desfile motorizado (só guarnição)', pessoal: [] },
     { id: 'desf8', label: '5 Ton Desfile Motorizado #8', grupo: 'Desfile motorizado (só guarnição)', pessoal: [] },
   ];
@@ -463,11 +466,12 @@
           var k = keyFor(v.id, idx);
           var checked = !!checkin[k];
           if (checked) totalConfirmados++;
+          var isCmt = p.grupo.indexOf("Sgt Cmt") !== -1;
           return '<li class="' + (checked ? "checked" : "") + '" data-key="' + k + '">' +
             '<input type="checkbox" ' + (checked ? "checked" : "") + '>' +
             '<span class="nr tabular">' + (idx + 1) + '</span>' +
             '<span class="nome">' + escapeHtml(p.nome) + '</span>' +
-            '<span class="grupo-tag">' + escapeHtml(p.grupo) + '</span></li>';
+            '<span class="grupo-tag' + (isCmt ? " cmt" : "") + '">' + escapeHtml(p.grupo) + '</span></li>';
         }).join("") + '</ul>';
       }
       card.innerHTML = head + listHtml;
