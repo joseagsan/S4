@@ -113,13 +113,14 @@
   .veic-head .tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-top: 2px; }
   .veic-head .tag.sem { color: var(--muted); }
   .veic-head .count { float: right; font-size: 12px; color: var(--muted); font-weight: 700; }
-  .veic-head .ch-vtr-field { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
-  .veic-head .ch-vtr-field label { font-size: 10.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; flex: none; }
-  .veic-head .ch-vtr-field input {
+  .veic-head .crew-fields { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .veic-head .crew-field { display: flex; align-items: center; gap: 6px; }
+  .veic-head .crew-field label { font-size: 10.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; flex: none; width: 78px; }
+  .veic-head .crew-field input {
     font: inherit; font-size: 12.5px; background: var(--surface); color: var(--ink); border: 1px solid var(--border);
     border-radius: 6px; padding: 5px 8px; flex: 1; min-width: 0;
   }
-  .veic-head .ch-vtr-field input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .veic-head .crew-field input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   .veic-list { list-style: none; margin: 0; padding: 6px 0; max-height: none; }
   .veic-list li {
     display: flex; align-items: center; gap: 8px; padding: 5px 14px; font-size: 12.5px; border-bottom: 1px solid var(--grid);
@@ -147,7 +148,7 @@
     body, .app { background: #fff; }
     .veic, .kpi { box-shadow: none; border: 1px solid #999; }
     .veic-grid { grid-template-columns: repeat(2, 1fr); }
-    .veic-head .ch-vtr-field input { border: none; border-bottom: 1px solid #999; border-radius: 0; padding: 2px 0; background: transparent; }
+    .veic-head .crew-field input { border: none; border-bottom: 1px solid #999; border-radius: 0; padding: 2px 0; background: transparent; }
   }
 </style>
 </head>
@@ -441,6 +442,19 @@
   var CHECK_STORAGE_KEY = "s4.escalaNominal.checkin.v1";
   var POS_STORAGE_KEY = "s4.escalaNominal.posicoes.v1";
   var CHVTR_STORAGE_KEY = "s4.escalaNominal.chefeVtr.v1";
+  var ARMADO_STORAGE_KEY = "s4.escalaNominal.militarArmado.v1";
+
+  // guarnição das peças (OTO Melara / Light Gun) que desfilam com as vtrs do desfile motorizado — 2 por vtr
+  var ARMADO_PADRAO = {
+    desf1: ["CB EP ALYSON", "CB EP KENNNEDY"],
+    desf2: ["CB EP NASCIMENTO", "CB EP AMARO"],
+    desf3: ["CB EP KAUÃ MATOS", "CB EP WESLEY"],
+    desf4: ["CB EP LEANDRO (NPOR)", "SD EP RARYSON"],
+    desf5: ["CB EP ADELSON", "CB EP RICHARD"],
+    desf6: ["CB EP GIBIM (NPOR)", "ANDRÉ LUIZ (NPOR)"],
+    desf7: ["SD EP TALLISON", "SD EP SOBRAL"],
+    desf8: ["SD EP MENDONÇA (NPOR)", "SD EP LIMA"]
+  };
 
   var VEIC_BY_ID = {};
   VEICULOS.forEach(function (v) { VEIC_BY_ID[v.id] = v; });
@@ -459,6 +473,13 @@
   var checkin = loadJson(CHECK_STORAGE_KEY);   // { personId: true }
   var posicoes = loadJson(POS_STORAGE_KEY);    // { personId: veiculoId } (só quando movido manualmente)
   var chefesVtr = loadJson(CHVTR_STORAGE_KEY); // { veiculoId: "Nome do Chefe de Vtr" }
+  var armados = loadJson(ARMADO_STORAGE_KEY);  // { "veiculoId::1" / "veiculoId::2": "Nome" }
+
+  function armadoValor(veicId, n) {
+    if (armados[veicId + "::" + n] !== undefined) return armados[veicId + "::" + n];
+    var padrao = ARMADO_PADRAO[veicId];
+    return padrao ? padrao[n - 1] : "";
+  }
 
   function vtrAtualDe(p) { return posicoes[p.id] || p.vtrPadrao; }
 
@@ -480,11 +501,21 @@
       var card = document.createElement("div");
       card.className = "veic";
       var tagClass = ocupantes.length ? "" : " sem";
+      var crewFields = '<div class="crew-fields">' +
+        '<div class="crew-field"><label for="chvtr-' + v.id + '">Ch Vtr</label>' +
+        '<input type="text" id="chvtr-' + v.id + '" data-veic="' + v.id + '" value="' +
+        escapeHtml(chefesVtr[v.id] || "") + '" placeholder="Nome do Chefe de Vtr"></div>';
+      if (ARMADO_PADRAO[v.id] || v.categoria === "Desfile motorizado") {
+        [1, 2].forEach(function (n) {
+          crewFields += '<div class="crew-field"><label for="armado' + n + '-' + v.id + '">Armado ' + n + '</label>' +
+            '<input type="text" id="armado' + n + '-' + v.id + '" data-veic="' + v.id + '" data-armado="' + n + '" value="' +
+            escapeHtml(armadoValor(v.id, n)) + '" placeholder="Militar armado ' + n + '"></div>';
+        });
+      }
+      crewFields += '</div>';
       var head = '<div class="veic-head"><span class="count">' + ocupantes.length + '</span>' +
         '<h3>' + escapeHtml(v.label) + '</h3><div class="tag' + tagClass + '">' + escapeHtml(v.categoria) + '</div>' +
-        '<div class="ch-vtr-field"><label for="chvtr-' + v.id + '">Ch Vtr</label>' +
-        '<input type="text" id="chvtr-' + v.id + '" data-veic="' + v.id + '" value="' +
-        escapeHtml(chefesVtr[v.id] || "") + '" placeholder="Nome do Chefe de Vtr"></div></div>';
+        crewFields + '</div>';
 
       var listHtml;
       if (!ocupantes.length) {
@@ -540,7 +571,15 @@
   });
 
   document.addEventListener("input", function (e) {
-    var chInp = e.target.closest(".ch-vtr-field input");
+    var armInp = e.target.closest(".crew-field input[data-armado]");
+    if (armInp) {
+      var veicIdA = armInp.getAttribute("data-veic");
+      var n = armInp.getAttribute("data-armado");
+      armados[veicIdA + "::" + n] = armInp.value;
+      persist(ARMADO_STORAGE_KEY, armados);
+      return;
+    }
+    var chInp = e.target.closest(".crew-field input:not([data-armado])");
     if (!chInp) return;
     var veicId = chInp.getAttribute("data-veic");
     chefesVtr[veicId] = chInp.value;
