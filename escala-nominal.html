@@ -126,11 +126,17 @@
   .veic-list li.checked .nome { text-decoration: line-through; color: var(--muted); }
   .veic-empty { padding: 14px; font-size: 12.5px; color: var(--muted); font-style: italic; }
   input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--accent); flex: none; }
+  .veic-list select.move-select {
+    font: inherit; font-size: 10.5px; background: var(--surface); color: var(--ink-2); border: 1px solid var(--border);
+    border-radius: 5px; padding: 2px 4px; flex: none; max-width: 118px;
+  }
+  .veic-list select.move-select:hover { border-color: var(--accent); color: var(--ink); }
 
   footer.appfoot { margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
 
   @media print {
     .no-print { display: none !important; }
+    .move-select { display: none !important; }
     body, .app { background: #fff; }
     .veic, .kpi { box-shadow: none; border: 1px solid #999; }
     .veic-grid { grid-template-columns: repeat(2, 1fr); }
@@ -146,17 +152,18 @@
       <div>
         <p class="eyebrow">Função S4 · Logística</p>
         <h1>Escala Nominal — Comboios do Desfile</h1>
-        <p class="sub">EM, Bloco 1, Bloco 2, Bloco 3, RP e Bandeiras Históricas, divididos por viatura. Oficiais no ônibus; cada viatura que leva praças de um bloco tem 1 sargento daquele bloco embarcado para comandar (destacado em azul).</p>
+        <p class="sub">EM, Bloco 1, Bloco 2, Bloco 3, RP e Bandeiras Históricas, divididos por viatura. Oficiais no ônibus; cada viatura que leva praças de um bloco tem 1 sargento daquele bloco embarcado para comandar (destacado em azul). Use o seletor ao lado de cada nome para mudar a viatura de alguém.</p>
       </div>
       <div class="actions no-print">
         <a href="comboios.html"><button class="ghost" type="button">← Comboios</button></a>
+        <button class="ghost" id="btn-reset-pos" type="button">Resetar posições</button>
         <button class="ghost" id="btn-reset" type="button">Limpar chamada</button>
         <button class="primary" id="btn-print" type="button">Imprimir / PDF</button>
       </div>
     </div>
 
     <div class="banner">
-      Fonte: planilha de blocos do desfile (7 Set 2026). CMT (TC Felipe Honorato) vai em viatura própria, fora desta lista. Equipe ST e Apoio não entra aqui — vai em outro momento, em viaturas à parte. As checkboxes marcam presença/embarque e ficam salvas neste navegador.
+      Fonte: planilha de blocos do desfile (7 Set 2026). CMT (TC Felipe Honorato) vai em viatura própria, fora desta lista. Equipe ST e Apoio não entra aqui — vai em outro momento, em viaturas à parte. As checkboxes marcam presença/embarque; o seletor de viatura muda quem vai em cada uma. Tudo fica salvo neste navegador.
     </div>
 
     <div class="kpis">
@@ -207,308 +214,335 @@
   }
 
   var VEICULOS = [
-    { id: 'onibus', label: 'Ônibus', grupo: 'Transporte de pessoal', pessoal: [
-      { nome: 'MAJ ASSIS', grupo: 'EM' },
-      { nome: 'CAP ALLAN COSTA', grupo: 'EM' },
-      { nome: '2º TEN NEGREIROS', grupo: 'EM' },
-      { nome: 'ST LERANDE', grupo: 'EM' },
-      { nome: 'CAP RIBEIRO', grupo: 'Bloco 1' },
-      { nome: 'TEN MARTINI', grupo: 'Bloco 1' },
-      { nome: 'TEN JOÃO OLIVEIRA', grupo: 'Bloco 1' },
-      { nome: 'TEN VENTILARI', grupo: 'Bloco 1' },
-      { nome: 'SGT CASTRO', grupo: 'Bloco 1' },
-      { nome: 'SGT WENDEL', grupo: 'Bloco 1' },
-      { nome: 'TEN RAPHAEL SANTOS', grupo: 'Bloco 2' },
-      { nome: 'TEN BATISTA', grupo: 'Bloco 2' },
-      { nome: 'TEN HENRIQUE', grupo: 'Bloco 2' },
-      { nome: '3 SGT JOAO PAULO', grupo: 'Bloco 2' },
-      { nome: '3 SGT BRANDÃO', grupo: 'Bloco 2' },
-      { nome: '3 SGT SILVEIRA', grupo: 'Bloco 2' },
-      { nome: '3 SGT PIETRO', grupo: 'Bloco 2' },
-      { nome: '1º TEN TEIXEIRA', grupo: 'Bloco 3' },
-      { nome: '2º TEN ARISTIDES', grupo: 'Bloco 3' },
-      { nome: '3ºSGT IAN SANTOS', grupo: 'Bloco 3' },
-      { nome: '3ºSGT ALFREDO', grupo: 'Bloco 3' },
-      { nome: '3ºSGT RODRIGO', grupo: 'Bloco 3' },
-      { nome: '3ºSGT ALEXSANDER', grupo: 'Bloco 3' },
-      { nome: '2º Ten Guimarães', grupo: 'RP' },
-      { nome: 'ST Melo', grupo: 'RP' },
-      { nome: 'Cap Brum', grupo: 'Bandeiras' },
-    ] },
-    { id: 'transp1', label: '5 Ton Transporte #1', grupo: 'Transporte de pessoal', pessoal: [
-      { nome: 'SGT ITALO', grupo: 'Bloco 1 · Sgt Cmt' },
-      { nome: 'SD EP BATISTA', grupo: 'Bloco 1' },
-      { nome: 'CB EP EDSON', grupo: 'Bloco 1' },
-      { nome: 'CB EP M SILVA', grupo: 'Bloco 1' },
-      { nome: 'CB EP SOARES', grupo: 'Bloco 1' },
-      { nome: 'SD EP REINALDO', grupo: 'Bloco 1' },
-      { nome: 'SD EP ABREU', grupo: 'Bloco 1' },
-      { nome: 'SD EP LOHAN', grupo: 'Bloco 1' },
-      { nome: 'SD EP MESQUITA', grupo: 'Bloco 1' },
-      { nome: 'SD EP LUIZ', grupo: 'Bloco 1' },
-      { nome: 'SD EP GIDEÃO', grupo: 'Bloco 1' },
-      { nome: 'SD EP TOME', grupo: 'Bloco 1' },
-      { nome: 'SD EP ISAIAS', grupo: 'Bloco 1' },
-      { nome: 'SD EP BONFIM', grupo: 'Bloco 1' },
-      { nome: 'SD EP LÚCIO', grupo: 'Bloco 1' },
-      { nome: 'SD EP FRANCISCO', grupo: 'Bloco 1' },
-      { nome: 'SD EP DE ARAÚJO', grupo: 'Bloco 1' },
-      { nome: 'SD EP BARROS', grupo: 'Bloco 1' },
-      { nome: 'SD EP SOUZA RODRIGUES', grupo: 'Bloco 1' },
-      { nome: 'SD EP SALES', grupo: 'Bloco 1' },
-      { nome: 'SD EP VINICIOS', grupo: 'Bloco 1' },
-      { nome: 'SD EP JAISLAN', grupo: 'Bloco 1' },
-      { nome: 'SD EP COSTA', grupo: 'Bloco 1' },
-    ] },
-    { id: 'transp2', label: '5 Ton Transporte #2', grupo: 'Transporte de pessoal', pessoal: [
-      { nome: 'SGT COIMBRA NETO', grupo: 'Bloco 1 · Sgt Cmt' },
-      { nome: 'SD EP ERIK', grupo: 'Bloco 1' },
-      { nome: 'SD EP VALENÇA', grupo: 'Bloco 1' },
-      { nome: 'SD EP ALBARADO', grupo: 'Bloco 1' },
-      { nome: 'SD EP NYCOLAS', grupo: 'Bloco 1' },
-      { nome: 'SD EP AMORIM', grupo: 'Bloco 1' },
-      { nome: 'Al ANDRADE', grupo: 'Bloco 1' },
-      { nome: 'Al ANDREY', grupo: 'Bloco 1' },
-      { nome: 'SD EV VELOSO', grupo: 'Bloco 1' },
-      { nome: 'SD EV SAMPAIO', grupo: 'Bloco 1' },
-      { nome: 'SD EV THIAGO', grupo: 'Bloco 1' },
-      { nome: 'SD EV KAULY', grupo: 'Bloco 1' },
-      { nome: 'SD EV CAUE', grupo: 'Bloco 1' },
-      { nome: 'SD EV F MORAES', grupo: 'Bloco 1' },
-      { nome: 'SD EV DA SILVA', grupo: 'Bloco 1' },
-      { nome: 'CB EP VITOR DIAS', grupo: 'Bloco 1' },
-      { nome: 'SD EP MOURA', grupo: 'Bloco 1' },
-      { nome: 'SD EV NATHAN', grupo: 'Bloco 1' },
-      { nome: 'SD EV ALBUQUERQUE', grupo: 'Bloco 1' },
-      { nome: 'SD EV LUCAS', grupo: 'Bloco 1' },
-      { nome: 'SD EV DE PAULA', grupo: 'Bloco 1' },
-      { nome: 'SD EV PEREIRA SANTOS', grupo: 'Bloco 1' },
-      { nome: 'SD EV FELIPE', grupo: 'Bloco 1' },
-    ] },
-    { id: 'transp3', label: '5 Ton Transporte #3', grupo: 'Transporte de pessoal', pessoal: [
-      { nome: 'SGT SANTANA', grupo: 'Bloco 1 · Sgt Cmt' },
-      { nome: 'SD EV DE SOUZA', grupo: 'Bloco 1' },
-      { nome: 'SD EV SILVA PEREIRA', grupo: 'Bloco 1' },
-      { nome: 'SD EV XAVIER', grupo: 'Bloco 1' },
-      { nome: 'SD EV ARAGÃO', grupo: 'Bloco 1' },
-      { nome: 'SD EV KELVEN', grupo: 'Bloco 1' },
-      { nome: 'SD EV JULIO CESAR', grupo: 'Bloco 1' },
-      { nome: 'CB SANTANA', grupo: 'EM' },
-      { nome: 'Sd Santos', grupo: 'RP' },
-      { nome: 'Al MENDES', grupo: 'Bandeiras' },
-      { nome: 'Al ISAC', grupo: 'Bandeiras' },
-      { nome: 'Al SANTANA', grupo: 'Bandeiras' },
-      { nome: 'Al DELRYK', grupo: 'Bandeiras' },
-      { nome: 'Al GRIZOTTI', grupo: 'Bandeiras' },
-      { nome: 'Al ROCHA', grupo: 'Bandeiras' },
-      { nome: 'Al MATIAS', grupo: 'Bandeiras' },
-      { nome: 'Al SERRA', grupo: 'Bandeiras' },
-      { nome: 'Al BONFIM', grupo: 'Bandeiras' },
-      { nome: 'Al MARCOS', grupo: 'Bandeiras' },
-      { nome: 'Al SAMPAIO', grupo: 'Bandeiras' },
-      { nome: 'Al NOGUEIRA', grupo: 'Bandeiras' },
-      { nome: 'Al ALÉCIO (RESERVA)', grupo: 'Bandeiras' },
-      { nome: 'Al PEREIRA (RESERVA)', grupo: 'Bandeiras' },
-    ] },
-    { id: 'desf1', label: '5 Ton Desfile Motorizado #1', grupo: 'Desfile motorizado (leva gente)', pessoal: [
-      { nome: '3 SGT EGGERS', grupo: 'Bloco 2 · Sgt Cmt' },
-      { nome: 'CB NAILSON', grupo: 'Bloco 2' },
-      { nome: 'CB JANIO', grupo: 'Bloco 2' },
-      { nome: 'CB MENDES', grupo: 'Bloco 2' },
-      { nome: 'CB SILVA LIMA', grupo: 'Bloco 2' },
-      { nome: 'CB VICTOR', grupo: 'Bloco 2' },
-      { nome: 'CB RIAN SILVA', grupo: 'Bloco 2' },
-      { nome: 'CB JOELTON', grupo: 'Bloco 2' },
-      { nome: 'CB PITTER', grupo: 'Bloco 2' },
-      { nome: 'CB MARINHO', grupo: 'Bloco 2' },
-      { nome: 'CB BARBOSA', grupo: 'Bloco 2' },
-      { nome: 'CB SOARES', grupo: 'Bloco 2' },
-      { nome: 'SD G FERNANDES', grupo: 'Bloco 2' },
-      { nome: 'SD EP MACHADO', grupo: 'Bloco 2' },
-      { nome: 'SD EP ALEXANDRO', grupo: 'Bloco 2' },
-      { nome: 'SD EP RICARDO', grupo: 'Bloco 2' },
-      { nome: 'SD EP RYAN', grupo: 'Bloco 2' },
-      { nome: 'SD EP CALEBE', grupo: 'Bloco 2' },
-      { nome: 'SD EP W SOARES', grupo: 'Bloco 2' },
-      { nome: 'SD PEREIRA', grupo: 'Bloco 2' },
-      { nome: 'SD EP BASTOS', grupo: 'Bloco 2' },
-      { nome: 'SD EP ISRAEL VIANA', grupo: 'Bloco 2' },
-      { nome: 'AS EP MULLER', grupo: 'Bloco 2' },
-    ] },
-    { id: 'desf2', label: '5 Ton Desfile Motorizado #2', grupo: 'Desfile motorizado (leva gente)', pessoal: [
-      { nome: '3 SGT NETO', grupo: 'Bloco 2 · Sgt Cmt' },
-      { nome: 'SD EP ANDRADE', grupo: 'Bloco 2' },
-      { nome: 'SD EP ALAN', grupo: 'Bloco 2' },
-      { nome: 'SD EV R SANTOS', grupo: 'Bloco 2' },
-      { nome: 'SD EV WILLIAN LIMA', grupo: 'Bloco 2' },
-      { nome: 'SD EV CARLOS', grupo: 'Bloco 2' },
-      { nome: 'SD EV RIOS', grupo: 'Bloco 2' },
-      { nome: 'SD EV FIGUEIREDO', grupo: 'Bloco 2' },
-      { nome: 'SD EV BORGES', grupo: 'Bloco 2' },
-      { nome: 'SD EP WILLIANS', grupo: 'Bloco 2' },
-      { nome: 'SD EP KEVY ALVES', grupo: 'Bloco 2' },
-      { nome: 'SD EP CALIXTO', grupo: 'Bloco 2' },
-      { nome: 'SD EP BRITO', grupo: 'Bloco 2' },
-      { nome: 'SD EP V ARAUJO', grupo: 'Bloco 2' },
-      { nome: 'SD EP AQUINO', grupo: 'Bloco 2' },
-      { nome: 'SD EP M AZEVEDO', grupo: 'Bloco 2' },
-      { nome: 'SD EP DANTAS', grupo: 'Bloco 2' },
-      { nome: 'SD EP HENRIQUE LIMA', grupo: 'Bloco 2' },
-      { nome: 'SD EP O DURANS', grupo: 'Bloco 2' },
-      { nome: 'SD EP K SILVA', grupo: 'Bloco 2' },
-      { nome: 'SD EP FLORENTINO', grupo: 'Bloco 2' },
-      { nome: 'SD EP PALHETA', grupo: 'Bloco 2' },
-      { nome: 'SD EP DIEMESON', grupo: 'Bloco 2' },
-    ] },
-    { id: 'desf3', label: '5 Ton Desfile Motorizado #3', grupo: 'Desfile motorizado (leva gente)', pessoal: [
-      { nome: '3 SGT GILVAN', grupo: 'Bloco 2 · Sgt Cmt' },
-      { nome: 'SD EP THOMAS', grupo: 'Bloco 2' },
-      { nome: 'SD EP JONAS SILVA', grupo: 'Bloco 2' },
-      { nome: 'SD EP TRINDADE', grupo: 'Bloco 2' },
-      { nome: 'SD EP COUTO', grupo: 'Bloco 2' },
-      { nome: 'SD EP LIMA PAIVA', grupo: 'Bloco 2' },
-    ] },
-    { id: 'desf4', label: '5 Ton Desfile Motorizado #4', grupo: 'Desfile motorizado (leva gente)', pessoal: [
-      { nome: '3ºSGT MAHAD', grupo: 'Bloco 3 · Sgt Cmt' },
-      { nome: 'SD EP PHELIPE', grupo: 'Bloco 3' },
-      { nome: 'SD EV FELIPE SILVA', grupo: 'Bloco 3' },
-      { nome: 'SD EP KAELL', grupo: 'Bloco 3' },
-      { nome: 'SD EV SANTYAGO', grupo: 'Bloco 3' },
-      { nome: 'CB ELIAS ARAUJO', grupo: 'Bloco 3' },
-      { nome: 'SD EP L.FERREIRA', grupo: 'Bloco 3' },
-      { nome: 'CB MATEUS', grupo: 'Bloco 3' },
-      { nome: 'SD EP IDELVAN', grupo: 'Bloco 3' },
-      { nome: 'CB ÍCARO', grupo: 'Bloco 3' },
-      { nome: 'SD EV DAVID CRUZ', grupo: 'Bloco 3' },
-      { nome: 'SD EP DOS SANTOS', grupo: 'Bloco 3' },
-      { nome: 'SD EP MARCOS BORGES', grupo: 'Bloco 3' },
-      { nome: 'SD EV CRUZ', grupo: 'Bloco 3' },
-      { nome: 'SD MENDONÇA', grupo: 'Bloco 3' },
-      { nome: 'SD EV ASSUNÇÃO', grupo: 'Bloco 3' },
-      { nome: 'SD EV TEODORO', grupo: 'Bloco 3' },
-      { nome: 'SD EP ALVES', grupo: 'Bloco 3' },
-      { nome: 'SD EP MARTINS SILVA', grupo: 'Bloco 3' },
-      { nome: 'SD EP GOMES', grupo: 'Bloco 3' },
-      { nome: 'SD EP SILVA', grupo: 'Bloco 3' },
-      { nome: 'SD EP PICANÇO', grupo: 'Bloco 3' },
-      { nome: 'SD EP DARLEN', grupo: 'Bloco 3' },
-    ] },
-    { id: 'desf5', label: '5 Ton Desfile Motorizado #5', grupo: 'Desfile motorizado (leva gente)', pessoal: [
-      { nome: '2º SGT ALEXANDRO', grupo: 'Bloco 3 · Sgt Cmt' },
-      { nome: 'SD EP RAMOS', grupo: 'Bloco 3' },
-      { nome: 'SD EP NETO', grupo: 'Bloco 3' },
-      { nome: 'SD EP R.HARTUR', grupo: 'Bloco 3' },
-      { nome: 'SD EP FELIX', grupo: 'Bloco 3' },
-      { nome: 'SD EV HENRIQUE', grupo: 'Bloco 3' },
-      { nome: 'SD EV DIAS', grupo: 'Bloco 3' },
-      { nome: 'SD EV DO VALE', grupo: 'Bloco 3' },
-      { nome: 'SD EV NÓBREGA', grupo: 'Bloco 3' },
-      { nome: 'SD EV EDEN SILVA', grupo: 'Bloco 3' },
-      { nome: 'SD EV GABRIEL SILVA', grupo: 'Bloco 3' },
-      { nome: 'SD EV CONCEIÇÃO', grupo: 'Bloco 3' },
-      { nome: 'SD EV DANTAS', grupo: 'Bloco 3' },
-      { nome: 'SD EV LORENZO', grupo: 'Bloco 3' },
-      { nome: 'SD EV ALVES CASTRO', grupo: 'Bloco 3' },
-      { nome: 'SD EV SIMPLICIO', grupo: 'Bloco 3' },
-      { nome: 'SD EV MOREIRA', grupo: 'Bloco 3' },
-      { nome: 'SD THIAGO COSTA', grupo: 'Bloco 3' },
-      { nome: 'SD ROGER', grupo: 'Bloco 3' },
-      { nome: 'SD RICHIL', grupo: 'Bloco 3' },
-      { nome: 'SD EV PABLO', grupo: 'Bloco 3' },
-      { nome: 'SD EV GONÇALVES', grupo: 'Bloco 3' },
-      { nome: 'SD EV CIQUEIRA', grupo: 'Bloco 3' },
-    ] },
-    { id: 'desf6', label: '5 Ton Desfile Motorizado #6', grupo: 'Desfile motorizado (leva gente)', pessoal: [
-      { nome: '3ºSGT SAMUEL SOUZA', grupo: 'Bloco 3 · Sgt Cmt' },
-      { nome: 'SD EV ERIC', grupo: 'Bloco 3' },
-      { nome: 'SD EV VELOSO', grupo: 'Bloco 3' },
-      { nome: 'SD EV KAWAN BARBOSA', grupo: 'Bloco 3' },
-      { nome: 'SDD EV KAIKE', grupo: 'Bloco 3' },
-      { nome: 'SD EV BARCELOS', grupo: 'Bloco 3' },
-    ] },
-    { id: 'desf7', label: '5 Ton Desfile Motorizado #7', grupo: 'Desfile motorizado (só guarnição)', pessoal: [] },
-    { id: 'desf8', label: '5 Ton Desfile Motorizado #8', grupo: 'Desfile motorizado (só guarnição)', pessoal: [] },
+    { id: 'onibus', label: 'Ônibus', categoria: 'Transporte de pessoal' },
+    { id: 'transp1', label: '5 Ton Transporte #1', categoria: 'Transporte de pessoal' },
+    { id: 'transp2', label: '5 Ton Transporte #2', categoria: 'Transporte de pessoal' },
+    { id: 'transp3', label: '5 Ton Transporte #3', categoria: 'Transporte de pessoal' },
+    { id: 'desf1', label: '5 Ton Desfile Motorizado #1', categoria: 'Desfile motorizado' },
+    { id: 'desf2', label: '5 Ton Desfile Motorizado #2', categoria: 'Desfile motorizado' },
+    { id: 'desf3', label: '5 Ton Desfile Motorizado #3', categoria: 'Desfile motorizado' },
+    { id: 'desf4', label: '5 Ton Desfile Motorizado #4', categoria: 'Desfile motorizado' },
+    { id: 'desf5', label: '5 Ton Desfile Motorizado #5', categoria: 'Desfile motorizado' },
+    { id: 'desf6', label: '5 Ton Desfile Motorizado #6', categoria: 'Desfile motorizado' },
+    { id: 'desf7', label: '5 Ton Desfile Motorizado #7', categoria: 'Desfile motorizado' },
+    { id: 'desf8', label: '5 Ton Desfile Motorizado #8', categoria: 'Desfile motorizado' },
   ];
 
-  function loadCheckin() {
+  var PESSOAS = [
+    { id: 'p1', nome: 'MAJ ASSIS', bloco: 'EM', tier: 'oficial', vtrPadrao: 'onibus' },
+    { id: 'p2', nome: 'CAP ALLAN COSTA', bloco: 'EM', tier: 'oficial', vtrPadrao: 'onibus' },
+    { id: 'p3', nome: '2º TEN NEGREIROS', bloco: 'EM', tier: 'oficial', vtrPadrao: 'onibus' },
+    { id: 'p4', nome: 'ST LERANDE', bloco: 'EM', tier: 'sgt', vtrPadrao: 'onibus' },
+    { id: 'p5', nome: 'CAP RIBEIRO', bloco: 'Bloco 1', tier: 'oficial', vtrPadrao: 'onibus' },
+    { id: 'p6', nome: 'TEN MARTINI', bloco: 'Bloco 1', tier: 'oficial', vtrPadrao: 'onibus' },
+    { id: 'p7', nome: 'TEN JOÃO OLIVEIRA', bloco: 'Bloco 1', tier: 'oficial', vtrPadrao: 'onibus' },
+    { id: 'p8', nome: 'TEN VENTILARI', bloco: 'Bloco 1', tier: 'oficial', vtrPadrao: 'onibus' },
+    { id: 'p9', nome: 'SGT CASTRO', bloco: 'Bloco 1', tier: 'sgt', vtrPadrao: 'onibus' },
+    { id: 'p10', nome: 'SGT WENDEL', bloco: 'Bloco 1', tier: 'sgt', vtrPadrao: 'onibus' },
+    { id: 'p11', nome: 'TEN RAPHAEL SANTOS', bloco: 'Bloco 2', tier: 'oficial', vtrPadrao: 'onibus' },
+    { id: 'p12', nome: 'TEN BATISTA', bloco: 'Bloco 2', tier: 'oficial', vtrPadrao: 'onibus' },
+    { id: 'p13', nome: 'TEN HENRIQUE', bloco: 'Bloco 2', tier: 'oficial', vtrPadrao: 'onibus' },
+    { id: 'p14', nome: '3 SGT JOAO PAULO', bloco: 'Bloco 2', tier: 'sgt', vtrPadrao: 'onibus' },
+    { id: 'p15', nome: '3 SGT BRANDÃO', bloco: 'Bloco 2', tier: 'sgt', vtrPadrao: 'onibus' },
+    { id: 'p16', nome: '3 SGT SILVEIRA', bloco: 'Bloco 2', tier: 'sgt', vtrPadrao: 'onibus' },
+    { id: 'p17', nome: '3 SGT PIETRO', bloco: 'Bloco 2', tier: 'sgt', vtrPadrao: 'onibus' },
+    { id: 'p18', nome: '1º TEN TEIXEIRA', bloco: 'Bloco 3', tier: 'oficial', vtrPadrao: 'onibus' },
+    { id: 'p19', nome: '2º TEN ARISTIDES', bloco: 'Bloco 3', tier: 'oficial', vtrPadrao: 'onibus' },
+    { id: 'p20', nome: '3ºSGT IAN SANTOS', bloco: 'Bloco 3', tier: 'sgt', vtrPadrao: 'onibus' },
+    { id: 'p21', nome: '3ºSGT ALFREDO', bloco: 'Bloco 3', tier: 'sgt', vtrPadrao: 'onibus' },
+    { id: 'p22', nome: '3ºSGT RODRIGO', bloco: 'Bloco 3', tier: 'sgt', vtrPadrao: 'onibus' },
+    { id: 'p23', nome: '3ºSGT ALEXSANDER', bloco: 'Bloco 3', tier: 'sgt', vtrPadrao: 'onibus' },
+    { id: 'p24', nome: '2º Ten Guimarães', bloco: 'RP', tier: 'oficial', vtrPadrao: 'onibus' },
+    { id: 'p25', nome: 'ST Melo', bloco: 'RP', tier: 'sgt', vtrPadrao: 'onibus' },
+    { id: 'p26', nome: 'Cap Brum', bloco: 'Bandeiras', tier: 'oficial', vtrPadrao: 'onibus' },
+    { id: 'p27', nome: 'SGT ITALO', bloco: 'Bloco 1', tier: 'sgt', vtrPadrao: 'transp1' },
+    { id: 'p28', nome: 'SD EP BATISTA', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p29', nome: 'CB EP EDSON', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p30', nome: 'CB EP M SILVA', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p31', nome: 'CB EP SOARES', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p32', nome: 'SD EP REINALDO', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p33', nome: 'SD EP ABREU', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p34', nome: 'SD EP LOHAN', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p35', nome: 'SD EP MESQUITA', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p36', nome: 'SD EP LUIZ', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p37', nome: 'SD EP GIDEÃO', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p38', nome: 'SD EP TOME', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p39', nome: 'SD EP ISAIAS', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p40', nome: 'SD EP BONFIM', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p41', nome: 'SD EP LÚCIO', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p42', nome: 'SD EP FRANCISCO', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p43', nome: 'SD EP DE ARAÚJO', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p44', nome: 'SD EP BARROS', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p45', nome: 'SD EP SOUZA RODRIGUES', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p46', nome: 'SD EP SALES', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p47', nome: 'SD EP VINICIOS', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p48', nome: 'SD EP JAISLAN', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p49', nome: 'SD EP COSTA', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp1' },
+    { id: 'p50', nome: 'SGT COIMBRA NETO', bloco: 'Bloco 1', tier: 'sgt', vtrPadrao: 'transp2' },
+    { id: 'p51', nome: 'SD EP ERIK', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p52', nome: 'SD EP VALENÇA', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p53', nome: 'SD EP ALBARADO', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p54', nome: 'SD EP NYCOLAS', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p55', nome: 'SD EP AMORIM', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p56', nome: 'Al ANDRADE', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p57', nome: 'Al ANDREY', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p58', nome: 'SD EV VELOSO', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p59', nome: 'SD EV SAMPAIO', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p60', nome: 'SD EV THIAGO', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p61', nome: 'SD EV KAULY', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p62', nome: 'SD EV CAUE', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p63', nome: 'SD EV F MORAES', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p64', nome: 'SD EV DA SILVA', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p65', nome: 'CB EP VITOR DIAS', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p66', nome: 'SD EP MOURA', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p67', nome: 'SD EV NATHAN', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p68', nome: 'SD EV ALBUQUERQUE', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p69', nome: 'SD EV LUCAS', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p70', nome: 'SD EV DE PAULA', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p71', nome: 'SD EV PEREIRA SANTOS', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p72', nome: 'SD EV FELIPE', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp2' },
+    { id: 'p73', nome: 'SGT SANTANA', bloco: 'Bloco 1', tier: 'sgt', vtrPadrao: 'transp3' },
+    { id: 'p74', nome: 'SD EV DE SOUZA', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p75', nome: 'SD EV SILVA PEREIRA', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p76', nome: 'SD EV XAVIER', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p77', nome: 'SD EV ARAGÃO', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p78', nome: 'SD EV KELVEN', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p79', nome: 'SD EV JULIO CESAR', bloco: 'Bloco 1', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p80', nome: 'CB SANTANA', bloco: 'EM', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p81', nome: 'Sd Santos', bloco: 'RP', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p82', nome: 'Al MENDES', bloco: 'Bandeiras', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p83', nome: 'Al ISAC', bloco: 'Bandeiras', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p84', nome: 'Al SANTANA', bloco: 'Bandeiras', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p85', nome: 'Al DELRYK', bloco: 'Bandeiras', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p86', nome: 'Al GRIZOTTI', bloco: 'Bandeiras', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p87', nome: 'Al ROCHA', bloco: 'Bandeiras', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p88', nome: 'Al MATIAS', bloco: 'Bandeiras', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p89', nome: 'Al SERRA', bloco: 'Bandeiras', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p90', nome: 'Al BONFIM', bloco: 'Bandeiras', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p91', nome: 'Al MARCOS', bloco: 'Bandeiras', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p92', nome: 'Al SAMPAIO', bloco: 'Bandeiras', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p93', nome: 'Al NOGUEIRA', bloco: 'Bandeiras', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p94', nome: 'Al ALÉCIO (RESERVA)', bloco: 'Bandeiras', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p95', nome: 'Al PEREIRA (RESERVA)', bloco: 'Bandeiras', tier: 'praca', vtrPadrao: 'transp3' },
+    { id: 'p96', nome: '3 SGT EGGERS', bloco: 'Bloco 2', tier: 'sgt', vtrPadrao: 'desf1' },
+    { id: 'p97', nome: 'CB NAILSON', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p98', nome: 'CB JANIO', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p99', nome: 'CB MENDES', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p100', nome: 'CB SILVA LIMA', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p101', nome: 'CB VICTOR', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p102', nome: 'CB RIAN SILVA', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p103', nome: 'CB JOELTON', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p104', nome: 'CB PITTER', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p105', nome: 'CB MARINHO', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p106', nome: 'CB BARBOSA', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p107', nome: 'CB SOARES', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p108', nome: 'SD G FERNANDES', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p109', nome: 'SD EP MACHADO', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p110', nome: 'SD EP ALEXANDRO', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p111', nome: 'SD EP RICARDO', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p112', nome: 'SD EP RYAN', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p113', nome: 'SD EP CALEBE', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p114', nome: 'SD EP W SOARES', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p115', nome: 'SD PEREIRA', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p116', nome: 'SD EP BASTOS', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p117', nome: 'SD EP ISRAEL VIANA', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p118', nome: 'AS EP MULLER', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf1' },
+    { id: 'p119', nome: '3 SGT NETO', bloco: 'Bloco 2', tier: 'sgt', vtrPadrao: 'desf2' },
+    { id: 'p120', nome: 'SD EP ANDRADE', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p121', nome: 'SD EP ALAN', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p122', nome: 'SD EV R SANTOS', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p123', nome: 'SD EV WILLIAN LIMA', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p124', nome: 'SD EV CARLOS', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p125', nome: 'SD EV RIOS', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p126', nome: 'SD EV FIGUEIREDO', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p127', nome: 'SD EV BORGES', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p128', nome: 'SD EP WILLIANS', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p129', nome: 'SD EP KEVY ALVES', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p130', nome: 'SD EP CALIXTO', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p131', nome: 'SD EP BRITO', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p132', nome: 'SD EP V ARAUJO', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p133', nome: 'SD EP AQUINO', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p134', nome: 'SD EP M AZEVEDO', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p135', nome: 'SD EP DANTAS', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p136', nome: 'SD EP HENRIQUE LIMA', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p137', nome: 'SD EP O DURANS', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p138', nome: 'SD EP K SILVA', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p139', nome: 'SD EP FLORENTINO', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p140', nome: 'SD EP PALHETA', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p141', nome: 'SD EP DIEMESON', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf2' },
+    { id: 'p142', nome: '3 SGT GILVAN', bloco: 'Bloco 2', tier: 'sgt', vtrPadrao: 'desf3' },
+    { id: 'p143', nome: 'SD EP THOMAS', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf3' },
+    { id: 'p144', nome: 'SD EP JONAS SILVA', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf3' },
+    { id: 'p145', nome: 'SD EP TRINDADE', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf3' },
+    { id: 'p146', nome: 'SD EP COUTO', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf3' },
+    { id: 'p147', nome: 'SD EP LIMA PAIVA', bloco: 'Bloco 2', tier: 'praca', vtrPadrao: 'desf3' },
+    { id: 'p148', nome: '3ºSGT MAHAD', bloco: 'Bloco 3', tier: 'sgt', vtrPadrao: 'desf4' },
+    { id: 'p149', nome: 'SD EP PHELIPE', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p150', nome: 'SD EV FELIPE SILVA', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p151', nome: 'SD EP KAELL', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p152', nome: 'SD EV SANTYAGO', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p153', nome: 'CB ELIAS ARAUJO', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p154', nome: 'SD EP L.FERREIRA', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p155', nome: 'CB MATEUS', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p156', nome: 'SD EP IDELVAN', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p157', nome: 'CB ÍCARO', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p158', nome: 'SD EV DAVID CRUZ', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p159', nome: 'SD EP DOS SANTOS', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p160', nome: 'SD EP MARCOS BORGES', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p161', nome: 'SD EV CRUZ', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p162', nome: 'SD MENDONÇA', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p163', nome: 'SD EV ASSUNÇÃO', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p164', nome: 'SD EV TEODORO', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p165', nome: 'SD EP ALVES', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p166', nome: 'SD EP MARTINS SILVA', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p167', nome: 'SD EP GOMES', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p168', nome: 'SD EP SILVA', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p169', nome: 'SD EP PICANÇO', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p170', nome: 'SD EP DARLEN', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf4' },
+    { id: 'p171', nome: '2º SGT ALEXANDRO', bloco: 'Bloco 3', tier: 'sgt', vtrPadrao: 'desf5' },
+    { id: 'p172', nome: 'SD EP RAMOS', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p173', nome: 'SD EP NETO', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p174', nome: 'SD EP R.HARTUR', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p175', nome: 'SD EP FELIX', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p176', nome: 'SD EV HENRIQUE', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p177', nome: 'SD EV DIAS', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p178', nome: 'SD EV DO VALE', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p179', nome: 'SD EV NÓBREGA', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p180', nome: 'SD EV EDEN SILVA', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p181', nome: 'SD EV GABRIEL SILVA', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p182', nome: 'SD EV CONCEIÇÃO', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p183', nome: 'SD EV DANTAS', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p184', nome: 'SD EV LORENZO', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p185', nome: 'SD EV ALVES CASTRO', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p186', nome: 'SD EV SIMPLICIO', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p187', nome: 'SD EV MOREIRA', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p188', nome: 'SD THIAGO COSTA', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p189', nome: 'SD ROGER', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p190', nome: 'SD RICHIL', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p191', nome: 'SD EV PABLO', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p192', nome: 'SD EV GONÇALVES', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p193', nome: 'SD EV CIQUEIRA', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf5' },
+    { id: 'p194', nome: '3ºSGT SAMUEL SOUZA', bloco: 'Bloco 3', tier: 'sgt', vtrPadrao: 'desf6' },
+    { id: 'p195', nome: 'SD EV ERIC', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf6' },
+    { id: 'p196', nome: 'SD EV VELOSO', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf6' },
+    { id: 'p197', nome: 'SD EV KAWAN BARBOSA', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf6' },
+    { id: 'p198', nome: 'SDD EV KAIKE', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf6' },
+    { id: 'p199', nome: 'SD EV BARCELOS', bloco: 'Bloco 3', tier: 'praca', vtrPadrao: 'desf6' },
+  ];
+
+  var CHECK_STORAGE_KEY = "s4.escalaNominal.checkin.v1";
+  var POS_STORAGE_KEY = "s4.escalaNominal.posicoes.v1";
+
+  var VEIC_BY_ID = {};
+  VEICULOS.forEach(function (v) { VEIC_BY_ID[v.id] = v; });
+
+  function loadJson(key) {
     try {
-      var raw = localStorage.getItem(CHECK_STORAGE_KEY);
+      var raw = localStorage.getItem(key);
       if (raw) return JSON.parse(raw);
     } catch (e) {}
     return {};
   }
-  function persistCheckin() {
-    try { localStorage.setItem(CHECK_STORAGE_KEY, JSON.stringify(checkin)); } catch (e) {}
+  function persist(key, obj) {
+    try { localStorage.setItem(key, JSON.stringify(obj)); } catch (e) {}
   }
-  var checkin = loadCheckin();
-  function keyFor(veicId, idx) { return veicId + "::" + idx; }
+
+  var checkin = loadJson(CHECK_STORAGE_KEY);   // { personId: true }
+  var posicoes = loadJson(POS_STORAGE_KEY);    // { personId: veiculoId } (só quando movido manualmente)
+
+  function vtrAtualDe(p) { return posicoes[p.id] || p.vtrPadrao; }
+
+  function moveOptionsHtml(selecionado) {
+    return VEICULOS.map(function (v) {
+      return '<option value="' + v.id + '"' + (v.id === selecionado ? " selected" : "") + '>' + escapeHtml(v.label) + '</option>';
+    }).join("");
+  }
 
   function renderVeiculos() {
     var grid = $("#veic-grid");
     grid.innerHTML = "";
-    var totalPessoal = 0, totalConfirmados = 0, viaturasComPessoal = 0, semPax = 0;
+    var totalConfirmados = 0, viaturasComPessoal = 0, semPax = 0;
 
     VEICULOS.forEach(function (v) {
-      totalPessoal += v.pessoal.length;
-      if (v.pessoal.length) viaturasComPessoal++; else semPax++;
+      var ocupantes = PESSOAS.filter(function (p) { return vtrAtualDe(p) === v.id; });
+      if (ocupantes.length) viaturasComPessoal++; else semPax++;
 
       var card = document.createElement("div");
       card.className = "veic";
-      var tagClass = v.pessoal.length ? "" : " sem";
-      var head = '<div class="veic-head"><span class="count">' + v.pessoal.length + '</span>' +
-        '<h3>' + escapeHtml(v.label) + '</h3><div class="tag' + tagClass + '">' + escapeHtml(v.grupo) + '</div></div>';
+      var tagClass = ocupantes.length ? "" : " sem";
+      var head = '<div class="veic-head"><span class="count">' + ocupantes.length + '</span>' +
+        '<h3>' + escapeHtml(v.label) + '</h3><div class="tag' + tagClass + '">' + escapeHtml(v.categoria) + '</div></div>';
 
       var listHtml;
-      if (!v.pessoal.length) {
-        listHtml = '<div class="veic-empty">Sem passageiro extra — só chefe de vtr, motorista e 2 militares armados (preencher no Comboios).</div>';
+      if (!ocupantes.length) {
+        listHtml = '<div class="veic-empty">Sem passageiro no momento — só chefe de vtr, motorista (e, se for do desfile, 2 militares armados), a preencher no Comboios.</div>';
       } else {
-        listHtml = '<ul class="veic-list">' + v.pessoal.map(function (p, idx) {
-          var k = keyFor(v.id, idx);
-          var checked = !!checkin[k];
+        listHtml = '<ul class="veic-list">' + ocupantes.map(function (p, idx) {
+          var checked = !!checkin[p.id];
           if (checked) totalConfirmados++;
-          var isCmt = p.grupo.indexOf("Sgt Cmt") !== -1;
-          return '<li class="' + (checked ? "checked" : "") + '" data-key="' + k + '">' +
+          var isCmt = p.tier === "sgt" && v.id !== "onibus";
+          var tagTxt = p.bloco + (isCmt ? " · Sgt Cmt" : "");
+          return '<li class="' + (checked ? "checked" : "") + '" data-pid="' + p.id + '">' +
             '<input type="checkbox" ' + (checked ? "checked" : "") + '>' +
             '<span class="nr tabular">' + (idx + 1) + '</span>' +
             '<span class="nome">' + escapeHtml(p.nome) + '</span>' +
-            '<span class="grupo-tag' + (isCmt ? " cmt" : "") + '">' + escapeHtml(p.grupo) + '</span></li>';
+            '<span class="grupo-tag' + (isCmt ? " cmt" : "") + '">' + escapeHtml(tagTxt) + '</span>' +
+            '<select class="move-select no-print" data-pid="' + p.id + '">' + moveOptionsHtml(v.id) + '</select>' +
+            '</li>';
         }).join("") + '</ul>';
       }
       card.innerHTML = head + listHtml;
       grid.appendChild(card);
     });
 
-    $("#kpi-total").textContent = totalPessoal;
+    $("#kpi-total").textContent = PESSOAS.length;
     $("#kpi-confirmados").textContent = totalConfirmados;
-    $("#kpi-confirmados-note").textContent = totalPessoal ? Math.round((totalConfirmados / totalPessoal) * 100) + "% da lista" : "";
+    $("#kpi-confirmados-note").textContent = PESSOAS.length ? Math.round((totalConfirmados / PESSOAS.length) * 100) + "% da lista" : "";
     $("#kpi-viaturas").textContent = viaturasComPessoal;
     $("#kpi-sem-pax").textContent = semPax;
   }
 
   document.addEventListener("change", function (e) {
     var cb = e.target.closest('.veic-list input[type=checkbox]');
-    if (!cb) return;
-    var li = cb.closest("li");
-    var key = li.getAttribute("data-key");
-    checkin[key] = cb.checked;
-    li.classList.toggle("checked", cb.checked);
-    persistCheckin();
-    var totalConfirmados = $$('.veic-list input[type=checkbox]:checked').length;
-    var totalPessoal = $$('.veic-list input[type=checkbox]').length;
-    $("#kpi-confirmados").textContent = totalConfirmados;
-    $("#kpi-confirmados-note").textContent = totalPessoal ? Math.round((totalConfirmados / totalPessoal) * 100) + "% da lista" : "";
+    if (cb) {
+      var li = cb.closest("li");
+      var pid = li.getAttribute("data-pid");
+      checkin[pid] = cb.checked;
+      li.classList.toggle("checked", cb.checked);
+      persist(CHECK_STORAGE_KEY, checkin);
+      var totalConfirmados = $$('.veic-list input[type=checkbox]:checked').length;
+      $("#kpi-confirmados").textContent = totalConfirmados;
+      $("#kpi-confirmados-note").textContent = PESSOAS.length ? Math.round((totalConfirmados / PESSOAS.length) * 100) + "% da lista" : "";
+      return;
+    }
+    var sel = e.target.closest("select.move-select");
+    if (sel) {
+      var pid2 = sel.getAttribute("data-pid");
+      var novoVeic = sel.value;
+      posicoes[pid2] = novoVeic;
+      persist(POS_STORAGE_KEY, posicoes);
+      renderVeiculos();
+      return;
+    }
   });
 
   $("#btn-print").addEventListener("click", function () { window.print(); });
   $("#btn-reset").addEventListener("click", function () {
     if (!window.confirm("Limpar todas as marcações de presença/embarque?")) return;
     checkin = {};
-    persistCheckin();
+    persist(CHECK_STORAGE_KEY, checkin);
+    renderVeiculos();
+  });
+  $("#btn-reset-pos").addEventListener("click", function () {
+    if (!window.confirm("Desfazer todas as mudanças de viatura e voltar à escala original?")) return;
+    posicoes = {};
+    persist(POS_STORAGE_KEY, posicoes);
     renderVeiculos();
   });
 
   renderVeiculos();
 })();
+
 </script>
 </body>
 </html>
