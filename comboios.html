@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planejamento de Comboios — Desfile</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page:      #eff2ee;
+    --surface:   #ffffff;
+    --surface-2: #f7f9f5;
+    --ink:       #14201c;
+    --ink-2:     #4b564f;
+    --muted:     #838f86;
+    --border:    #d7ded8;
+    --grid:      #e3e8e1;
+    --accent:    #2a78d6;
+    --accent-ink:#ffffff;
+    --accent-wash: #e4eefb;
+    --good:      #0ca30c;
+    --good-wash: #e2f5df;
+    --warning:   #b8790a;
+    --warning-wash: #faf0da;
+    --critical:  #d03b3b;
+    --critical-wash: #fbe6e4;
+    --shadow: 0 1px 2px rgba(20,32,28,0.06), 0 8px 24px -12px rgba(20,32,28,0.18);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page:      #0e1512;
+      --surface:   #16201c;
+      --surface-2: #192622;
+      --ink:       #eaefea;
+      --ink-2:     #a8b3ab;
+      --muted:     #7c877e;
+      --border:    #29332d;
+      --grid:      #26302a;
+      --accent:    #3987e5;
+      --accent-ink:#08121e;
+      --accent-wash: #16273b;
+      --good:      #35c24a;
+      --good-wash: #123821;
+      --warning:   #e0a83e;
+      --warning-wash: #3a2c0f;
+      --critical:  #e0645c;
+      --critical-wash: #3b1917;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page:      #0e1512;
+    --surface:   #16201c;
+    --surface-2: #192622;
+    --ink:       #eaefea;
+    --ink-2:     #a8b3ab;
+    --muted:     #7c877e;
+    --border:    #29332d;
+    --grid:      #26302a;
+    --accent:    #3987e5;
+    --accent-ink:#08121e;
+    --accent-wash: #16273b;
+    --good:      #35c24a;
+    --good-wash: #123821;
+    --warning:   #e0a83e;
+    --warning-wash: #3a2c0f;
+    --critical:  #e0645c;
+    --critical-wash: #3b1917;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.55);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { background: var(--page); }
+  body { margin: 0; }
+  .app {
+    background: var(--page);
+    color: var(--ink);
+    font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    min-height: 100%;
+    padding: 20px 20px 64px;
+    line-height: 1.45;
+  }
+  .app h1, .app h2, .app h3 {
+    font-family: "Bahnschrift", "Segoe UI Semibold", "Arial Narrow", ui-sans-serif, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+  .mono, .tabular { font-variant-numeric: tabular-nums; }
+
+  .shell { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .topbar .eyebrow { text-transform: uppercase; letter-spacing: 0.09em; font-size: 11px; font-weight: 700; color: var(--accent); margin: 0 0 4px; }
+  .topbar h1 { font-size: 24px; }
+  .topbar .sub { color: var(--ink-2); font-size: 13.5px; margin-top: 4px; }
+  .topbar .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  a { color: var(--accent); }
+
+  button {
+    font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--ink); padding: 9px 14px; font-size: 13.5px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 6px; transition: background .12s, border-color .12s, transform .05s;
+  }
+  button:hover { border-color: var(--accent); }
+  button:active { transform: translateY(1px); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  button.ghost { background: transparent; }
+  button svg { width: 15px; height: 15px; flex: none; }
+
+  .banner {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    background: var(--accent-wash); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 10px 14px; font-size: 13px; color: var(--ink-2);
+  }
+  .banner strong { color: var(--ink); }
+  .banner.warn { background: var(--warning-wash); }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media (max-width: 760px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px 16px; box-shadow: var(--shadow); position: relative; overflow: hidden;
+  }
+  .kpi::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--kpi-c, var(--accent)); }
+  .kpi .label { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; }
+  .kpi .value { font-size: 26px; font-weight: 700; margin-top: 4px; }
+  .kpi .note { font-size: 12px; color: var(--ink-2); margin-top: 2px; }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
+  .panel h2 { font-size: 15px; }
+  .panel .panel-sub { font-size: 12px; color: var(--muted); margin-top: 2px; margin-bottom: 12px; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+  table { border-collapse: collapse; width: 100%; min-width: 720px; font-size: 13px; }
+  thead th {
+    text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted);
+    padding: 10px 12px; border-bottom: 1px solid var(--border); background: var(--surface-2); white-space: nowrap;
+  }
+  tbody td { padding: 8px 12px; border-bottom: 1px solid var(--grid); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+  .veh-id .prefixo { font-weight: 700; }
+  .veh-id .modelo { font-size: 11.5px; color: var(--muted); }
+  .ord { color: var(--muted); font-weight: 700; width: 28px; }
+
+  input[type=text], input[type=number], select {
+    font: inherit; background: var(--surface); color: var(--ink); border: 1px solid var(--border);
+    border-radius: 7px; padding: 7px 9px; font-size: 13px; width: 100%; min-width: 130px;
+  }
+  input[type=text]::placeholder { color: var(--muted); }
+  .assign-select { min-width: 190px; }
+  .qtd-col { width: 90px; }
+  input.qtd-input { min-width: 64px; text-align: right; }
+
+  .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+  .badge.desfile { background: var(--accent-wash); color: var(--accent); }
+  .badge.transporte { background: var(--good-wash); color: var(--good); }
+  .badge.none { background: var(--surface-2); color: var(--muted); }
+
+  .calc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 14px; }
+  .calc-field label { display: block; font-size: 11.5px; font-weight: 700; color: var(--ink-2); margin-bottom: 4px; }
+  .calc-summary { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .calc-stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; font-size: 12px; color: var(--ink-2); min-width: 140px; }
+  .calc-stat strong { display: block; font-size: 18px; color: var(--ink); margin-top: 2px; }
+  .calc-badge { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-weight: 700; font-size: 13.5px; }
+  .calc-badge.ok { background: var(--good-wash); color: var(--good); }
+  .calc-badge.bad { background: var(--critical-wash); color: var(--critical); }
+  .calc-badge:not(.ok):not(.bad) { background: var(--surface-2); color: var(--muted); }
+  .calc-note { font-size: 12.5px; color: var(--ink-2); margin-top: 8px; }
+  .calc-fechamento { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
+
+  .table-foot { padding: 9px 12px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); }
+  .empty-mini { padding: 24px; text-align: center; color: var(--muted); font-size: 13px; }
+
+  footer.appfoot { margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
+
+  @media print {
+    .no-print { display: none !important; }
+    body, .app { background: #fff; }
+    .panel, .table-wrap, .kpi { box-shadow: none; border: 1px solid #999; }
+    input[type=text] { border: none; border-bottom: 1px solid #999; border-radius: 0; padding: 2px 0; }
+    select.assign-select { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <div class="shell">
+
+    <div class="topbar">
+      <div>
+        <p class="eyebrow">Função S4 · Logística</p>
+        <h1>Planejamento de Comboios — Desfile</h1>
+        <p class="sub">Ordem de deslocamento da coluna: Comboio 1 — desfile motorizado (chefe de vtr + motorista + 2 militares armados por viatura) à frente, seguido do Comboio 2 — transporte de pessoal (5 Ton + ônibus).</p>
+      </div>
+      <div class="actions no-print">
+        <a href="index.html"><button class="ghost" type="button">← Controle de viaturas</button></a>
+        <a href="escala-nominal.html"><button class="ghost" type="button">Escala nominal →</button></a>
+        <button class="ghost" id="btn-reset" type="button">Limpar nomes</button>
+        <button class="primary" id="btn-print" type="button">Imprimir / PDF</button>
+      </div>
+    </div>
+
+    <div class="banner" id="source-banner" hidden></div>
+
+    <div class="kpis">
+      <div class="kpi" style="--kpi-c: var(--accent)">
+        <div class="label">Vtrs — Desfile motorizado</div>
+        <div class="value tabular" id="kpi-desfile">0</div>
+        <div class="note" id="kpi-desfile-note">&nbsp;</div>
+      </div>
+      <div class="kpi" style="--kpi-c: var(--accent)">
+        <div class="label">Efetivo p/ comboio (tripulação)</div>
+        <div class="value tabular" id="kpi-desfile-efetivo">0</div>
+        <div class="note">chefe + motorista + 2 armados, por vtr</div>
+      </div>
+      <div class="kpi" style="--kpi-c: var(--good)">
+        <div class="label">Vtrs — Transporte de pessoal</div>
+        <div class="value tabular" id="kpi-transporte">0</div>
+        <div class="note" id="kpi-transporte-note">&nbsp;</div>
+      </div>
+      <div class="kpi" style="--kpi-c: var(--good)">
+        <div class="label">Efetivo p/ comboio (tripulação)</div>
+        <div class="value tabular" id="kpi-transporte-efetivo">0</div>
+        <div class="note">chefe + motorista, por vtr</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Comboio 1 — Desfile motorizado <span class="badge desfile">1º na coluna</span></h2>
+      <p class="panel-sub">Preencha o nome do Chefe de Vtr, do motorista e dos 2 militares armados de cada viatura. Segue à frente na coluna de deslocamento.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="ord">Ord</th>
+              <th>Viatura</th>
+              <th>Chefe de Vtr</th>
+              <th>Motorista</th>
+              <th>Militar armado 1</th>
+              <th>Militar armado 2</th>
+              <th class="qtd-col">Qtd militares</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-desfile"></tbody>
+        </table>
+        <div class="empty-mini" id="empty-desfile" hidden>Nenhuma viatura atribuída a este comboio. Ajuste o comboio de cada viatura na tabela "Frota disponível" abaixo.</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Comboio 2 — Transporte de pessoal <span class="badge transporte">2º na coluna</span></h2>
+      <p class="panel-sub">Viaturas destinadas a levar o efetivo até o local do desfile. Desloca-se atrás do Comboio 1.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="ord">Ord</th>
+              <th>Viatura</th>
+              <th>Chefe de Vtr</th>
+              <th>Motorista</th>
+              <th class="qtd-col">Qtd militares</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-transporte"></tbody>
+        </table>
+        <div class="empty-mini" id="empty-transporte" hidden>Nenhuma viatura atribuída a este comboio. Ajuste o comboio de cada viatura na tabela "Frota disponível" abaixo.</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Necessidade de transporte de pessoal</h2>
+      <p class="panel-sub">Compara o efetivo a transportar com a capacidade das viaturas já atribuídas ao Comboio 2. Recalcula sozinho se você mudar o comboio de alguma viatura.</p>
+      <div class="calc-grid no-print">
+        <div class="calc-field"><label for="calc-efetivo">Efetivo a transportar</label><input type="number" id="calc-efetivo" min="0" step="1"></div>
+        <div class="calc-field"><label for="calc-onibus">Pessoal por ônibus</label><input type="number" id="calc-onibus" min="0" step="1"></div>
+        <div class="calc-field"><label for="calc-5ton-min">Pessoal por 5 Ton (mín.)</label><input type="number" id="calc-5ton-min" min="0" step="1"></div>
+        <div class="calc-field"><label for="calc-5ton-max">Pessoal por 5 Ton (máx.)</label><input type="number" id="calc-5ton-max" min="0" step="1"></div>
+        <div class="calc-field"><label for="calc-marrua">Pessoal por Marruá (se precisar puxar do desfile)</label><input type="number" id="calc-marrua" min="0" step="1"></div>
+      </div>
+      <div id="calc-result"></div>
+    </div>
+
+    <div class="panel no-print">
+      <h2>Frota disponível</h2>
+      <p class="panel-sub">Somente viaturas com situação "Disponível" no Controle de Viaturas aparecem aqui. Escolha o comboio de cada uma (a sugestão já vem preenchida por tipo de viatura).</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Viatura</th>
+              <th>Tipo</th>
+              <th>Comboio</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-frota"></tbody>
+        </table>
+        <div class="table-foot" id="frota-foot"></div>
+      </div>
+    </div>
+
+    <footer class="appfoot">
+      <span>Os nomes preenchidos ficam salvos apenas neste navegador (armazenamento local), junto com o cadastro de viaturas.</span>
+      <span>A lista de viaturas vem do <a href="index.html">Controle de Viaturas</a> (mesmo cadastro, mesmo navegador). Cadastre ou atualize a situação das viaturas por lá antes de montar os comboios.</span>
+    </footer>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var VEH_STORAGE_KEY = "s4.controleViaturas.v1";
+  var PLAN_STORAGE_KEY = "s4.comboiosDesfile.v1";
+
+  var TIPO_LABEL = {
+    leve: "Viatura leve", "5ton": "5 Ton", marrua: "Marruá", onibus: "Ônibus",
+    reboque: "Reboque", blindada: "Blindada", moto: "Motocicleta", outro: "Outro"
+  };
+
+  var DEFAULT_ASSIGN = {
+    leve: "desfile", marrua: "desfile", moto: "desfile", blindada: "desfile",
+    "5ton": "transporte", onibus: "transporte",
+    reboque: "none", outro: "none"
+  };
+
+  var $ = function (sel, root) { return (root || document).querySelector(sel); };
+  var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
+
+  function seedData() {
+    function v(o) {
+      return Object.assign({ id: "v" + o.prefixo, situacao: "disponivel" }, o);
+    }
+    return [
+      v({ prefixo: "EB3411237965", tipo: "onibus", modelo: "Volkswagen 15190 (Ônibus Rural)" }),
+      v({ prefixo: "EB3412163736", tipo: "5ton", modelo: "Mercedes Atego 1418 (5 Ton Comercial)" }),
+      v({ prefixo: "EB3412277388", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)" }),
+      v({ prefixo: "EB3412071243", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)" }),
+      v({ prefixo: "EB3412277376", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)" }),
+      v({ prefixo: "EB3412071229", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)" }),
+      v({ prefixo: "EB3412277402", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)" }),
+      v({ prefixo: "EB3412071371", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)" }),
+      v({ prefixo: "EB3412277352", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)" }),
+      v({ prefixo: "EB3412277390", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)" }),
+      v({ prefixo: "EB3412071270", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)" }),
+      v({ prefixo: "EB3412277337", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)" }),
+      v({ prefixo: "EB3412277414", tipo: "5ton", modelo: "Mercedes Atego 1725 (5 Ton)" }),
+      v({ prefixo: "EB3413528342", tipo: "leve", modelo: "Toyota Hilux CS/Ambulância" }),
+      v({ prefixo: "EB3412201012", tipo: "marrua", modelo: "Agrale Marruá AM20 (¾ Ton)" }),
+      v({ prefixo: "EB3412201289", tipo: "marrua", modelo: "Agrale Marruá AM20 (¾ Ton)" }),
+      v({ prefixo: "EB3412229960", tipo: "marrua", modelo: "Agrale Marruá AM20 (¾ Ton)" }),
+      v({ prefixo: "EB3412229945", tipo: "marrua", modelo: "Agrale Marruá AM20 (¾ Ton)" }),
+      v({ prefixo: "EB3412511029", tipo: "marrua", modelo: "Agrale Marruá AM20 (¾ Ton)" }),
+      v({ prefixo: "EB3471510235", tipo: "leve", modelo: "Peugeot 408" }),
+      v({ prefixo: "EB3472533256", tipo: "leve", modelo: "Nissan Frontier" }),
+      v({ prefixo: "RZC9J14", tipo: "leve", modelo: "Renault Ambulância" }),
+      v({ prefixo: "EB3471548781", tipo: "5ton", modelo: "Iveco Daily 45-160" })
+    ];
+  }
+
+  function loadFrota() {
+    try {
+      var raw = localStorage.getItem(VEH_STORAGE_KEY);
+      if (raw) {
+        var list = JSON.parse(raw);
+        if (Array.isArray(list) && list.length) return { list: list, fromStorage: true };
+      }
+    } catch (e) {}
+    return { list: seedData(), fromStorage: false };
+  }
+
+  function loadPlan() {
+    try {
+      var raw = localStorage.getItem(PLAN_STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return {};
+  }
+
+  function persistPlan() {
+    try { localStorage.setItem(PLAN_STORAGE_KEY, JSON.stringify(plan)); } catch (e) {}
+  }
+
+  var frotaResult = loadFrota();
+  var todasViaturas = frotaResult.list;
+  var disponiveis = todasViaturas.filter(function (v) { return v.situacao === "disponivel"; });
+  var plan = loadPlan(); // { [id]: { assign, chefe, motorista, arm1, arm2 } }
+
+  function entryFor(v) {
+    if (!plan[v.id]) {
+      plan[v.id] = { assign: DEFAULT_ASSIGN[v.tipo] || "none", chefe: "", motorista: "", arm1: "", arm2: "", qtd: "" };
+    }
+    if (plan[v.id].qtd === undefined) plan[v.id].qtd = "";
+    return plan[v.id];
+  }
+  disponiveis.forEach(entryFor);
+
+  function escapeHtml(s) {
+    return (s || "").toString().replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function sourceBanner() {
+    var el = $("#source-banner");
+    if (frotaResult.fromStorage) {
+      el.hidden = true;
+      return;
+    }
+    el.hidden = false;
+    el.classList.add("warn");
+    el.innerHTML = '<span>Nenhum cadastro salvo foi encontrado neste navegador — a lista abaixo usa a <strong>frota de exemplo</strong>. Abra o <a href="index.html">Controle de Viaturas</a> neste mesmo navegador para carregar/atualizar o cadastro real antes de fechar os comboios.</span>';
+  }
+
+  function renderFrota() {
+    var tbody = $("#tbody-frota");
+    tbody.innerHTML = "";
+    disponiveis.slice().sort(function (a, b) {
+      return (a.tipo || "").localeCompare(b.tipo || "") || (a.prefixo || "").localeCompare(b.prefixo || "");
+    }).forEach(function (v) {
+      var e = entryFor(v);
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        '<td><div class="veh-id"><span class="prefixo">' + escapeHtml(v.prefixo || "—") + '</span>' +
+        '<div class="modelo">' + escapeHtml(v.modelo || "") + '</div></div></td>' +
+        '<td>' + (TIPO_LABEL[v.tipo] || "Outro") + '</td>' +
+        '<td><select class="assign-select" data-id="' + v.id + '">' +
+          '<option value="desfile"' + (e.assign === "desfile" ? " selected" : "") + '>Comboio 1 — Desfile motorizado</option>' +
+          '<option value="transporte"' + (e.assign === "transporte" ? " selected" : "") + '>Comboio 2 — Transporte de pessoal</option>' +
+          '<option value="none"' + (e.assign === "none" ? " selected" : "") + '>Não incluir</option>' +
+        '</select></td>';
+      tbody.appendChild(tr);
+    });
+    var indispCount = todasViaturas.length - disponiveis.length;
+    $("#frota-foot").textContent = disponiveis.length + " viatura(s) disponível(is)" +
+      (indispCount ? " · " + indispCount + " indisponível/em manutenção (não listada)" : "");
+  }
+
+  function fieldTd(id, field, value, placeholder, opts) {
+    opts = opts || {};
+    var type = opts.number ? "number" : "text";
+    var cls = opts.number ? ' class="qtd-input tabular"' : "";
+    var extra = opts.number ? ' min="0" step="1"' : "";
+    return '<td><input type="' + type + '"' + cls + ' data-id="' + id + '" data-field="' + field + '" value="' +
+      escapeHtml(value) + '" placeholder="' + placeholder + '"' + extra + '></td>';
+  }
+
+  function renderComboio(assignKey, tbodySel, emptySel, fields) {
+    var tbody = $(tbodySel);
+    tbody.innerHTML = "";
+    var list = disponiveis.filter(function (v) { return entryFor(v).assign === assignKey; })
+      .sort(function (a, b) { return (a.tipo || "").localeCompare(b.tipo || "") || (a.prefixo || "").localeCompare(b.prefixo || ""); });
+    $(emptySel).hidden = list.length !== 0;
+    list.forEach(function (v, i) {
+      var e = entryFor(v);
+      var tr = document.createElement("tr");
+      var tds = '<td class="ord tabular">' + (i + 1) + '</td>' +
+        '<td><div class="veh-id"><span class="prefixo">' + escapeHtml(v.prefixo || "—") + '</span>' +
+        '<div class="modelo">' + escapeHtml((TIPO_LABEL[v.tipo] || "Outro") + (v.modelo ? " · " + v.modelo : "")) + '</div></div></td>';
+      fields.forEach(function (f) { tds += fieldTd(v.id, f.key, e[f.key], f.placeholder, { number: f.number }); });
+      tr.innerHTML = tds;
+      tbody.appendChild(tr);
+    });
+  }
+
+  var CALC_DEFAULTS = { efetivo: 210, onibus: 34, min5: 20, max5: 25, marrua: 10 };
+  var CALC_FIELDS = { "calc-efetivo": "efetivo", "calc-onibus": "onibus", "calc-5ton-min": "min5", "calc-5ton-max": "max5", "calc-marrua": "marrua" };
+  var calc = Object.assign({}, CALC_DEFAULTS, plan._calc || {});
+
+  function persistCalc() { plan._calc = calc; persistPlan(); }
+
+  function fillCalcInputs() {
+    Object.keys(CALC_FIELDS).forEach(function (id) { $("#" + id).value = calc[CALC_FIELDS[id]]; });
+  }
+
+  function renderCalcResult() {
+    // 5 Ton e ônibus contam como capacidade de transporte onde quer que estejam
+    // (inclusive "emprestados" para o Comboio 1, viajando na formação do desfile).
+    var emUso = disponiveis.filter(function (v) { var a = entryFor(v).assign; return a === "transporte" || a === "desfile"; });
+    var nOnibus = emUso.filter(function (v) { return v.tipo === "onibus"; }).length;
+    var n5tonTransporte = emUso.filter(function (v) { return v.tipo === "5ton" && entryFor(v).assign === "transporte"; }).length;
+    var n5tonDesfile = emUso.filter(function (v) { return v.tipo === "5ton" && entryFor(v).assign === "desfile"; }).length;
+    var n5tonTotal = n5tonTransporte + n5tonDesfile;
+    var capMin = nOnibus * calc.onibus + n5tonTotal * calc.min5;
+    var capMax = nOnibus * calc.onibus + n5tonTotal * calc.max5;
+    var efetivo = calc.efetivo;
+
+    var html = '<div class="calc-summary">' +
+      '<div class="calc-stat">Ônibus (Comboio 2)<strong class="tabular">' + nOnibus + '</strong></div>' +
+      '<div class="calc-stat">5 Ton no Comboio 2<strong class="tabular">' + n5tonTransporte + '</strong></div>' +
+      '<div class="calc-stat">5 Ton no Comboio 1 (desfile)<strong class="tabular">' + n5tonDesfile + '</strong></div>' +
+      '<div class="calc-stat">Capacidade estimada<strong class="tabular">' + capMin + (capMax !== capMin ? '–' + capMax : '') + ' pessoal</strong></div>' +
+      '</div>';
+
+    if (efetivo <= capMin) {
+      var folga = capMin - efetivo;
+      html += '<div class="calc-badge ok">✓ Capacidade suficiente para ' + efetivo + ' militares</div>' +
+        '<p class="calc-note">Mesmo no pior caso (' + calc.min5 + ' por 5 Ton), sobram ' + folga + ' vaga(s).' +
+        (n5tonDesfile ? ' Os ' + n5tonDesfile + ' 5 Ton do Comboio 1 precisam de chefe de vtr, motorista e 2 militares armados, como as demais viaturas do desfile.' : '') + '</p>';
+    } else {
+      var falta = efetivo - capMin;
+      var ton5NecessariosExtra = Math.ceil(falta / calc.min5);
+      var ton5ForaDeUso = disponiveis.filter(function (v) { return v.tipo === "5ton" && entryFor(v).assign === "none"; }).length;
+      var marruasNecessarias = calc.marrua > 0 ? Math.ceil(falta / calc.marrua) : 0;
+      var marruasNoDesfile = disponiveis.filter(function (v) { return entryFor(v).assign === "desfile" && v.tipo === "marrua"; }).length;
+      html += '<div class="calc-badge bad">⚠ Faltam ' + falta + ' vaga(s) (pior caso) para ' + efetivo + ' militares</div>' +
+        '<p class="calc-note">Sugestão: passe mais ' + ton5NecessariosExtra + ' 5 Ton para o Comboio 1 (desfile) na tabela "Frota disponível" abaixo — cada um com chefe de vtr, motorista e 2 militares armados, além dos passageiros. ' +
+        'Há ' + ton5ForaDeUso + ' 5 Ton fora de uso (não incluído) hoje' +
+        (ton5ForaDeUso < ton5NecessariosExtra ? ' — não é suficiente sozinho; considere também ' + marruasNecessarias + ' Marruá(s) (há ' + marruasNoDesfile + ' no Comboio 1) ou outro meio de transporte.' : '.') + '</p>';
+    }
+
+    var lancado = disponiveis.reduce(function (sum, v) {
+      var a = entryFor(v).assign;
+      if (a !== "transporte" && a !== "desfile") return sum;
+      return sum + (parseInt(entryFor(v).qtd, 10) || 0);
+    }, 0);
+    var diff = efetivo - lancado;
+    html += '<div class="calc-fechamento">' +
+      '<div class="calc-stat">Lançado na coluna "Qtd militares"<strong class="tabular">' + lancado + '</strong></div>';
+    if (diff === 0 && lancado > 0) {
+      html += '<div class="calc-badge ok">✓ Fecha com o efetivo (' + efetivo + ')</div>';
+    } else if (lancado === 0) {
+      html += '<div class="calc-badge">Ainda sem lançamentos — preencha a coluna "Qtd militares" em cada viatura</div>';
+    } else if (diff > 0) {
+      html += '<div class="calc-badge bad">⚠ Faltam lançar ' + diff + ' militar(es)</div>';
+    } else {
+      html += '<div class="calc-badge bad">⚠ ' + (-diff) + ' militar(es) a mais do que o efetivo (' + efetivo + ')</div>';
+    }
+    html += '</div>';
+
+    $("#calc-result").innerHTML = html;
+  }
+
+  function renderKpis() {
+    var nDesfile = disponiveis.filter(function (v) { return entryFor(v).assign === "desfile"; }).length;
+    var nTransporte = disponiveis.filter(function (v) { return entryFor(v).assign === "transporte"; }).length;
+    $("#kpi-desfile").textContent = nDesfile;
+    $("#kpi-desfile-note").textContent = nDesfile === 1 ? "1 viatura" : nDesfile + " viaturas";
+    $("#kpi-desfile-efetivo").textContent = nDesfile * 4;
+    $("#kpi-transporte").textContent = nTransporte;
+    $("#kpi-transporte-note").textContent = nTransporte === 1 ? "1 viatura" : nTransporte + " viaturas";
+    $("#kpi-transporte-efetivo").textContent = nTransporte * 2;
+  }
+
+  function renderAll() {
+    sourceBanner();
+    renderFrota();
+    renderComboio("desfile", "#tbody-desfile", "#empty-desfile", [
+      { key: "chefe", placeholder: "Nome do Chefe de Vtr" },
+      { key: "motorista", placeholder: "Nome do motorista" },
+      { key: "arm1", placeholder: "Militar armado 1" },
+      { key: "arm2", placeholder: "Militar armado 2" },
+      { key: "qtd", placeholder: "Qtd", number: true }
+    ]);
+    renderComboio("transporte", "#tbody-transporte", "#empty-transporte", [
+      { key: "chefe", placeholder: "Nome do Chefe de Vtr" },
+      { key: "motorista", placeholder: "Nome do motorista" },
+      { key: "qtd", placeholder: "Qtd", number: true }
+    ]);
+    renderKpis();
+    renderCalcResult();
+  }
+
+  Object.keys(CALC_FIELDS).forEach(function (id) {
+    $("#" + id).addEventListener("input", function (e) {
+      calc[CALC_FIELDS[id]] = parseInt(e.target.value, 10) || 0;
+      persistCalc();
+      renderCalcResult();
+    });
+  });
+
+  document.addEventListener("change", function (e) {
+    var sel = e.target.closest("select.assign-select");
+    if (sel) {
+      var id = sel.getAttribute("data-id");
+      entryFor({ id: id }); // no-op guard; entry already exists for known ids
+      if (!plan[id]) plan[id] = { assign: "none", chefe: "", motorista: "", arm1: "", arm2: "", qtd: "" };
+      plan[id].assign = sel.value;
+      persistPlan();
+      renderAll();
+      return;
+    }
+  });
+
+  document.addEventListener("input", function (e) {
+    var inp = e.target.closest("input[data-field]");
+    if (!inp) return;
+    var id = inp.getAttribute("data-id");
+    var field = inp.getAttribute("data-field");
+    if (!plan[id]) plan[id] = { assign: "none", chefe: "", motorista: "", arm1: "", arm2: "", qtd: "" };
+    plan[id][field] = inp.value;
+    persistPlan();
+    if (field === "qtd") renderCalcResult();
+  });
+
+  $("#btn-print").addEventListener("click", function () { window.print(); });
+
+  $("#btn-reset").addEventListener("click", function () {
+    if (!window.confirm("Limpar todos os nomes preenchidos (chefes de vtr, motoristas e militares armados)? A atribuição de comboio de cada viatura é mantida.")) return;
+    disponiveis.forEach(function (v) {
+      var e = entryFor(v);
+      e.chefe = ""; e.motorista = ""; e.arm1 = ""; e.arm2 = "";
+    });
+    persistPlan();
+    renderAll();
+  });
+
+  fillCalcInputs();
+  renderAll();
+})();
+</script>
+</body>
+</html>
