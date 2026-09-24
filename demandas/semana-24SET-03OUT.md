@@ -35,6 +35,7 @@
 - [ ] Acionar fiscal de contrato para os 2 orçamentos de locação (ver abaixo)
 - [ ] Acionar Menezes: organização PO e PMT (prazo 29SET)
 - [ ] Acionar baterias: manutenção da área dos novos PNR (prazo 29SET)
+- [ ] **Descobrir data/horário da atividade na Catedral** (palavras do CMA) → define o transporte
 
 ### sex 25SET
 - [ ] **Pronto diário das pendências com a SALC**
@@ -77,6 +78,7 @@
   - [ ] Pavilhão NPOR
   - [ ] Melhoria nos banheiros
 - [ ] Almoço no GAC
+- [ ] Descobrir data/horário da atividade na Catedral
 - [ ] Deslocamento Of/ST/Sgt → Catedral (ônibus ou 5 ton) — aguardando data/hora
 - [ ] Muro concluído
 - [ ] Área dos novos PNR em ordem (29SET)
